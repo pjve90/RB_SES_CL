@@ -27,7 +27,7 @@ library(dplyr)
 #Importing CASEN database
 
 #importing CASEN with spss.get()
-casen <- spss.get("folder_directory", use.value.labels=TRUE)
+casen <- spss.get("C:/Users/Pablo/Dropbox/Publicacion/RB_SES_CL/CASEN_2013_MN_B_Principal.sav", use.value.labels=TRUE)
 #corroboration that is a data frame
 is.data.frame(casen)
 
@@ -76,6 +76,9 @@ sum(is.na(mc$s5))
 sum(is.na(mc$s6))
 namc <- mc[complete.cases(mc[,151:152]),]
 
+#Selection of childless women
+shm <- mc[which(mc$s5 ==0),]
+
 #Children selection of mononuclear households
 #children of both partners in the household selection
 haun <- unnucleo[which(unnucleo$pco1 == "Hijo(a) de ambos"),]
@@ -88,9 +91,6 @@ hpun <- unnucleo[which(unnucleo$pco1 == "Hijo(a) s?lo del esposo(a) o pareja"),]
 sum(is.na(hpun$pco1))
 #combination of children selections
 hun <- rbind(hjun, haun, hpun)
-
-#Selection of children of women in the cohort
-hmc <- hun[which((hun$folio %in% namc$folio) == TRUE),]
 
 #Selection of youngest children of women in the cohort
 tblhmc <- tbl_df(hmc)
