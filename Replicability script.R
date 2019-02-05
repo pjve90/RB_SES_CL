@@ -1011,7 +1011,7 @@ glmeuh.1 <- glm(euh ~ educ + ytrabajoCorh + yoautCorh + ysubh +ytotcorh + ypchto
 summary(glmeuh.1)
 par(mfrow=c(2,2))
 plot(glmeuh.1)
-#glma without total incomes
+#glm without total incomes
 glmeuh2 <- glm(euh~region+comuna+zona+pco1+ESC+educ+ytrabajoCorh+yoautCorh+yautcorh+ysubh+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = gaussian(link = "identity"),data = testeuh)
 summary(glmeuh2)
 par(mfrow=c(2,2))
@@ -1021,7 +1021,7 @@ glmeuh2.1 <-glm(euh ~ educ + ytrabajoCorh + ysubh + v9, family = gaussian(link =
 summary(glmeuh2.1)
 par(mfrow=c(2,2))
 plot(glmeuh2.1)
-#glma only with total income
+#glm only with total income
 glmeuh3 <- glm(euh~region+comuna+zona+pco1+ESC+educ+ytotcorh+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = gaussian(link = "identity"),data = testeuh)
 summary(glmeuh3)
 par(mfrow=c(2,2))
@@ -1031,7 +1031,7 @@ glmeuh3.1 <- glm(euh ~ educ + ytotcorh + s14 + v9, family = gaussian(link = "ide
 summary(glmeuh3.1)
 par(mfrow=c(2,2))
 plot(glmeuh3.1)
-#glma only with per capita income
+#glm only with per capita income
 glmeuh4 <- glm(euh~region+comuna+zona+pco1+ESC+educ+ypchtot+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = gaussian(link = "identity"),data = testeuh)
 summary(glmeuh4)
 par(mfrow=c(2,2))
@@ -1064,7 +1064,7 @@ glmien.1 <- glm(formula = ien ~ pco1 + ESC + ytrabajoCorh + ypchtot + v6 + regio
 summary(glmien.1)
 par(mfrow=c(2,2))
 plot(glmien.1)
-#glma without total incomes
+#glm without total incomes
 glmien2 <- glm(ien~region+comuna+zona+pco1+ESC+educ+ytrabajoCorh+yoautCorh+yautcorh+ysubh+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = Gamma(link = "inverse"), data = testien)
 summary(glmien2)
 par(mfrow=c(2,2))
@@ -1074,7 +1074,7 @@ glmien2.1 <-glm(ien ~ pco1 + ESC + ytrabajoCorh + v6 + region +ethnic, family = 
 summary(glmien2.1)
 par(mfrow=c(2,2))
 plot(glmien2.1)
-#glma only with total income
+#glm only with total income
 glmien3 <- glm(ien~region+comuna+zona+pco1+ESC+educ+ytotcorh+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = Gamma(link = "inverse"), data = testien)
 summary(glmien3)
 par(mfrow=c(2,2))
@@ -1084,7 +1084,7 @@ glmien3.1 <- glm(formula = ien ~ pco1 + ESC + ytotcorh + v6 + region + ethnic,fa
 summary(glmien3.1)
 par(mfrow=c(2,2))
 plot(glmien3.1)
-#glma only with per capita income
+#glm only with per capita income
 glmien4 <- glm(ien~region+comuna+zona+pco1+ESC+educ+ypchtot+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26,family = Gamma(link = "inverse"), data = testien)
 summary(glmien4)
 par(mfrow=c(2,2))
@@ -1114,7 +1114,7 @@ glmrd.1 <- glm(log(rd) ~ pco1 + ESC + ytrabajoCorh + v6 + region +ethnic, family
 summary(glmrd.1)
 par(mfrow=c(2,2))
 plot(glmrd.1)
-#glma without total incomes
+#glm without total incomes
 glmrd2 <- glm(log(rd)~region+comuna+zona+pco1+ESC+educ+ytrabajoCorh+yoautCorh+yautcorh+ysubh+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = gaussian(link = "identity"), data = testrd)
 summary(glmrd2)
 par(mfrow=c(2,2))
@@ -1124,7 +1124,7 @@ glmrd2.1 <-glm(log(rd) ~ pco1 + ESC + ytrabajoCorh + v6 + region +ethnic, family
 summary(glmrd2.1)
 par(mfrow=c(2,2))
 plot(glmrd2.1)
-#glma only with total income
+#glm only with total income
 glmrd3 <- glm(log(rd)~region+comuna+zona+pco1+ESC+educ+ytotcorh+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = gaussian(link = "identity"), data = testrd)
 summary(glmrd3)
 par(mfrow=c(2,2))
@@ -1134,7 +1134,7 @@ glmrd3.1 <- glm(log(rd) ~ pco1 + ESC + ytotcorh + v6 + region +ethnic, family = 
 summary(glmrd3.1)
 par(mfrow=c(2,2))
 plot(glmrd3.1)
-#glma only with per capita income
+#glm only with per capita income
 glmrd4 <- glm(log(rd)~region+comuna+zona+pco1+ESC+educ+ypchtot+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = gaussian(link = "identity"), data = testrd)
 summary(glmrd4)
 par(mfrow=c(2,2))
@@ -1145,7 +1145,68 @@ summary(glmrd4.1)
 par(mfrow=c(2,2))
 plot(glmrd4.1)
 
+#model selection
+#AIC
+#Nº of Offspring
+AIC(glms5.1,glms52.1,glms53.1,glms54.1)
+#model selected: glms54.1 but glms5.1 has the lowest
+#Age at first reproduction
+AIC(glms6.1,glms6.1.1,glms6.1.2,glms62.1,glms62.1.1,glms62.1.2,glms63.1,glms63.1.1,glms63.1.2,glms64.1,glms64.1.1,glms64.1.2)
+#model selected: glms63.1.2 but glms6.1 has the lowest
+#Age at last reproduction
+AIC(glmeuh.1,glmeuh2.1,glmeuh3.1,glmeuh4.1)
+#model selected: glmeuh2.1 but glmeuh.1 has the lowest
+#Interbirth interval
+AIC(glmien.1,glmien2.1,glmien3.1,glmien4.1)
+#model selected: glmien2.1 but glmien.1 has the lowest
+#Parity degree
+AIC(glmrd.1,glmrd2.1,glmrd3.1,glmrd4.1)
+#model selected: glmrd.1 because is the same as glmrd2.1
+#VIF
+#install car package
+install.packages("car")
+library(car)
+#check vif
+#Nº of Offspring
+vif(glms5.1)
+vif(glms54.1)
+#model selected: glms54.1
+summary(glms54.1)
+Anova(glms54.1)
+#Age at first reproduction
+vif(glms6.1)
+vif(glms63.1.2)
+#model selected: glms63.1.2
+summary(glms63.1.2)
+Anova(glms63.1.2)
+#Age at last reproduction
+vif(glmeuh.1)
+vif(glmeuh2.1)
+#model selected: glmeuh2.1
+summary(glmeuh2.1)
+Anova(glmeuh2.1)
+#Interbirth intervals
+vif(glmien.1)
+vif(glmien2.1)
+#model selected: glmien2.1
+summary(glmien2.1)
+Anova(glmien2.1)
+#Parity degree
+vif(glmrd.1)
+summary(glmrd.1)
+Anova(glmrd.1)
 
+#plotting
+#Nº of Offspring
+crPlots(glms54.1)
+#Age at first reproduction
+crPlots(glms63.1.2)
+#Age at last reproduction
+crPlots(glmeuh2.1)
+#Interbirth interval
+crPlots(glmien2.1)
+#Parity degree
+crPlots(glmrd.1)
 
 # #R packages to use
 # #Package FactoMineR
