@@ -923,7 +923,7 @@ library(ggeffects)
 
 #predicted values
 preds5 <- final
-preds5$preds <- predict(lmes5, type="response")
+preds5$preds <- predict(lmes5.2, type="response")
 preds5 <- preds5[with(preds5,order(zona,ses)),]
 #plot
 ggplot(preds5, aes(x = ses, y = preds, colour=zona)) +
@@ -932,26 +932,27 @@ ggplot(preds5, aes(x = ses, y = preds, colour=zona)) +
 #comuna
 ggplot(final, aes(x=ses, y=s5)) +
   geom_point() +
-  geom_line(aes(y=predict(lmes5), group=comuna, colour=comuna))+
+  geom_line(aes(y=predict(lmes5.2), group=comuna, colour=comuna))+
   theme_classic()
 #region
 ggplot(final, aes(x=ses, y=s5)) +
   geom_point()+
-  geom_line(aes(y=predict(lmes5), group=region, colour=region))+
+  geom_line(aes(y=predict(lmes5.2), group=region, colour=region))+
   ylim(0,11)+
   theme_classic()
 #zona
 ggplot(final, aes(x=ses, y=s5)) +
   geom_point() +
-  geom_line(aes(y=predict(lmes5),colour=zona))+
+  geom_line(aes(y=predict(lmes5.2),colour=zona))+
   theme_classic()
 #r6
 ggplot(final, aes(x=ses, y=s5)) +
   geom_point() +
-  geom_line(aes(y=predict(lmes5), group=r6, colour=r6))+
+  geom_line(aes(y=predict(lmes5.2), group=r6, colour=r6))+
   theme_classic()
-using ggpredict
-preds5 <- ggpredict(lmes5, type="re")
+
+#using ggpredict
+preds5 <- ggpredict(lmes5.2, type="re")
 #plot
 ggplot(preds5$ses,aes(x,predicted))+
   geom_line() +
