@@ -1,7 +1,7 @@
 #Replicability script
 #Pablo Varas Enr?quez, Luseadra McKerracher, Nicol?s Montalva Rivera 
 
-#Workspace management
+# Workspace management ----------------------------------------------------
 
 #Establishing directory
 getwd()
@@ -14,24 +14,25 @@ load(".~RB_SES_CL.RData")
 memory.limit()
 memory.size(max = FALSE)
 
-#1.- Cohort selection, data mining and management
+
+# #1.- Cohort selection, data mining and management -----------------------
+
 
 #R package to use
 #"Hmisc" package
 install.packages("Hmisc")
 library(Hmisc)
-#"dplyr" package
-install.packages("dplyr")
-library(dplyr)
-
-#Importing CASEN database
+#"tidyverse" package
+install.packages("tidyverse")
+library(tidyverse)
 
 #importing CASEN with spss.get()
 casen <- spss.get("C:/Users/Pablo/Documents/Dropbox antiguo/Publicacion/RB_SES_CL/CASEN_2013_MN_B_Principal.sav", use.value.labels=TRUE)
 #corroboration that is a data frame
 is.data.frame(casen)
 
-#Data mining and management
+
+# #Data mining and management ---------------------------------------------
 
 #Generation of deciles by income
 casen$decilth <- ntile(casen$ytotcorh, 10)
@@ -104,14 +105,19 @@ womych <- womych[order(womych[,1]),]
 summary(womych$s5)
 summary(womych$s6)
 
-#Number of children (s5) into numeric
+
+# #Number of children (s5) into numeric -----------------------------------
+
 womych$s5[which(womych$s5 == "No sabe / No recuerda")] <- NA
 womych$s5[which(womych$s5 == "No sabe")] <- NA
 summary(womych$s5)
 is.factor(womych$s5)
 womych$s5 <- as.numeric(levels(womych$s5))[womych$s5]
 is.numeric(womych$s5)
-#Age at first birth (s6) into numeric
+
+
+# #Age at first birth (s6) into numeric -----------------------------------
+
 womych$s6[which(womych$s6 == "No sabe / No recuerda")] <- NA
 womych$s6[which(womych$s6 == "No sabe")] <- NA
 summary(womych$s6)
@@ -119,14 +125,20 @@ is.factor(womych$s6)
 womych$s6 <- as.numeric(levels(womych$s6))[womych$s6]
 is.numeric(womych$s6)
 
-#Age at last birth
+
+# #Age at last birth ------------------------------------------------------
+
+
 womych <- arrange(womych, folio, desc(pco1))
 womych <- group_by(womych, folio)
 womych <- mutate(womych, euh = edad - lag(edad))
 summary(womych$euh)
 sum(is.na(womych$euh))
 
-#Interbirth intervals
+
+# #Interbirth intervals ---------------------------------------------------
+
+
 womych <- mutate(womych, ien = (euh - s6)/s5)
 summary(womych$ien)
 womych$euh
@@ -134,13 +146,19 @@ womych$ien
 sum(is.na(womych$ien))
 womych <- data.frame(womych)
 
-#Reproductive density
+
+# #Modes of parity --------------------------------------------------------
+
+
 womych <- mutate(womych, rd = s5/(euh - s6))
 summary(womych$rd)
 sum(is.na(womych$rd))
 womych <- data.frame(womych)
 
-#Cleaning final cohort
+
+# #Cleaning final cohort --------------------------------------------------
+
+
 sum(is.na(womych$s5))
 sum(is.na(womych$s6))
 sum(is.na(womych$euh))
@@ -156,7 +174,10 @@ fcohort$rd[fcohort$s6 == fcohort$euh & fcohort$s5 == 1] <- 0
 fcohort <- fcohort[which(fcohort$rd != Inf),]
 fcohort <- fcohort[which(fcohort$rd <= 1),]
 
-#Selection of childless women
+
+# #Selection of childless women -------------------------------------------
+
+
 nochild <- wom4549[which(wom4549$s5 ==0),]
 nochild$s5[which(nochild$s5 == "No sabe / No recuerda")] <- NA
 nochild$s5[which(nochild$s5 == "No sabe")] <- NA
@@ -177,7 +198,10 @@ nochild$r1a <- droplevels(nochild$r1a)
 nochild <- nochild[which(nochild$pco1 == "Jefe(a) de hogar" | nochild$pco1 == "Esposo(a) o pareja"),]
 summary(nochild$pco1)
 nochild$pco1 <- droplevels(nochild$pco1)
-#Final cohort database
+
+# #Final cohort database --------------------------------------------------
+
+
 fcohort <- rbind(fcohort,nochild)
 sum(is.na(fcohort$edad))
 summary(fcohort$edad)
@@ -192,7 +216,9 @@ summary(fcohort$ien)
 sum(is.na(fcohort$rd)) 
 summary(fcohort$rd)
 
-#2.- Socioeconomic groups
+
+# #2.- Socioeconomic groups -----------------------------------------------
+
 
 test <- fcohort
 #region
@@ -392,91 +418,6 @@ plot(s6~log(ypchtot), data=test, ylab=c("AFR"), main="AFR ~ ypchtot")
 plot(euh~log(ypchtot), data=test, ylab=c("ALR"), main="ALR ~ ypchtot")
 plot(ien~log(ypchtot), data=test, ylab=c("IBI"), main="IBI ~ ypchtot")
 plot(rd~log(ypchtot), data=test, ylab=c("RD"), main="RD ~ ypchtot")
-#deciles total household income
-is.factor(test$decilth)
-test$decilth <- as.factor(test$decilth)
-sum(is.na(test$decilth))
-levels(test$decilth)
-summary(test$decilth)
-summary(aov(s5~decilth, data=test))
-summary(aov(s6~decilth, data=test))
-summary(aov(euh~decilth, data=test))
-summary(aov(ien~decilth, data=test))
-summary(aov(rd~decilth, data=test))
-layout(mat = matrix(c(1,1,2,2,3,3,0,4,4,5,5,0), nrow = 2, byrow = TRUE))
-plot(s5~decilth, data=test, ylab=c("Nº Offs."), main="Nº Offs. ~ decilth")
-plot(s6~decilth, data=test, ylab=c("AFR"), main="AFR ~ decilth")
-plot(euh~decilth, data=test, ylab=c("ALR"), main="ALR ~ decilth")
-plot(ien~decilth, data=test, ylab=c("IBI"), main="IBI ~ decilth")
-plot(rd~decilth, data=test, ylab=c("RD"), main="RD ~ decilth")
-#quintiles total household income
-is.factor(test$quintilth)
-test$quintilth <- as.factor(test$quintilth)
-sum(is.na(test$quintilth))
-levels(test$quintilth)
-summary(test$quintilth)
-summary(aov(s5~quintilth, data=test))
-summary(aov(s6~quintilth, data=test))
-summary(aov(euh~quintilth, data=test))
-summary(aov(ien~quintilth, data=test))
-summary(aov(rd~quintilth, data=test))
-layout(mat = matrix(c(1,1,2,2,3,3,0,4,4,5,5,0), nrow = 2, byrow = TRUE))
-plot(s5~quintilth, data=test, ylab=c("Nº Offs."), main="Nº Offs. ~ quintilth")
-plot(s6~quintilth, data=test, ylab=c("AFR"), main="AFR ~ quintilth")
-plot(euh~quintilth, data=test, ylab=c("ALR"), main="ALR ~ quintilth")
-plot(ien~quintilth, data=test, ylab=c("IBI"), main="IBI ~ quintilth")
-plot(rd~quintilth, data=test, ylab=c("RD"), main="RD ~ quintilth")
-#cuartiles total household income
-is.factor(test$cuartilth)
-test$cuartilth <- as.factor(test$cuartilth)
-sum(is.na(test$cuartilth))
-levels(test$cuartilth)
-summary(test$cuartilth)
-summary(aov(s5~cuartilth, data=test))
-summary(aov(s6~cuartilth, data=test))
-summary(aov(euh~cuartilth, data=test))
-summary(aov(ien~cuartilth, data=test))
-summary(aov(rd~cuartilth, data=test))
-layout(mat = matrix(c(1,1,2,2,3,3,0,4,4,5,5,0), nrow = 2, byrow = TRUE))
-plot(s5~cuartilth, data=test, ylab=c("Nº Offs."), main="Nº Offs. ~ cuartilth")
-plot(s6~cuartilth, data=test, ylab=c("AFR"), main="AFR ~ cuartilth")
-plot(euh~cuartilth, data=test, ylab=c("ALR"), main="ALR ~ cuartilth")
-plot(ien~cuartilth, data=test, ylab=c("IBI"), main="IBI ~ cuartilth")
-plot(rd~cuartilth, data=test, ylab=c("RD"), main="RD ~ cuartilth")
-#terciles total household income
-is.factor(test$tercilth)
-test$tercilth <- as.factor(test$tercilth)
-sum(is.na(test$tercilth))
-levels(test$tercilth)
-summary(test$tercilth)
-summary(aov(s5~tercilth, data=test))
-summary(aov(s6~tercilth, data=test))
-summary(aov(euh~tercilth, data=test))
-summary(aov(ien~tercilth, data=test))
-summary(aov(rd~tercilth, data=test))
-layout(mat = matrix(c(1,1,2,2,3,3,0,4,4,5,5,0), nrow = 2, byrow = TRUE))
-plot(s5~tercilth, data=test, ylab=c("Nº Offs."), main="Nº Offs. ~ tercilth")
-plot(s6~tercilth, data=test, ylab=c("AFR"), main="AFR ~ tercilth")
-plot(euh~tercilth, data=test, ylab=c("ALR"), main="ALR ~ tercilth")
-plot(ien~tercilth, data=test, ylab=c("IBI"), main="IBI ~ tercilth")
-plot(rd~tercilth, data=test, ylab=c("RD"), main="RD ~ tercilth")
-#high-low total household income
-is.factor(test$altobajoth)
-test$altobajoth <- as.factor(test$altobajoth)
-sum(is.na(test$altobajoth))
-levels(test$altobajoth)
-summary(test$altobajoth)
-summary(aov(s5~altobajoth, data=test))
-summary(aov(s6~altobajoth, data=test))
-summary(aov(euh~altobajoth, data=test))
-summary(aov(ien~altobajoth, data=test))
-summary(aov(rd~altobajoth, data=test))
-layout(mat = matrix(c(1,1,2,2,3,3,0,4,4,5,5,0), nrow = 2, byrow = TRUE))
-plot(s5~altobajoth, data=test, ylab=c("Nº Offs."), main="Nº Offs. ~ altobajoth")
-plot(s6~altobajoth, data=test, ylab=c("AFR"), main="AFR ~ altobajoth")
-plot(euh~altobajoth, data=test, ylab=c("ALR"), main="ALR ~ altobajoth")
-plot(ien~altobajoth, data=test, ylab=c("IBI"), main="IBI ~ altobajoth")
-plot(rd~altobajoth, data=test, ylab=c("RD"), main="RD ~ altobajoth")
 #healthcare system
 is.factor(test$s14)
 sum(is.na(test$s14))
@@ -499,50 +440,6 @@ plot(s6~s14, data=test, ylab=c("AFR"), main="AFR ~ s14")
 plot(euh~s14, data=test, ylab=c("ALR"), main="ALR ~ s14")
 plot(ien~s14, data=test, ylab=c("IBI"), main="IBI ~ s14")
 plot(rd~s14, data=test, ylab=c("RD"), main="RD ~ s14")
-#mother educational level
-is.factor(test$r4mn)
-sum(is.na(test$r4mn))
-levels(test$r4mn)
-summary(test$r4mn)
-test$r4mn[which(test$r4mn == "No sabe")] <- NA
-summary(test$r4mn)
-test <- test[complete.cases(test[,c("r4mn")]),]
-sum(is.na(test$r4mn))
-test$r4mn <- droplevels(test$r4mn)
-summary(test$r4mn)
-summary(aov(s5~r4mn, data=test))
-summary(aov(s6~r4mn, data=test))
-summary(aov(euh~r4mn, data=test))
-summary(aov(ien~r4mn, data=test))
-summary(aov(rd~r4mn, data=test))
-layout(mat = matrix(c(1,1,2,2,3,3,0,4,4,5,5,0), nrow = 2, byrow = TRUE))
-plot(s5~r4mn, data=test, ylab=c("Nº Offs."), main="Nº Offs. ~ r4mn")
-plot(s6~r4mn, data=test, ylab=c("AFR"), main="AFR ~ r4mn")
-plot(euh~r4mn, data=test, ylab=c("ALR"), main="ALR ~ r4mn")
-plot(ien~r4mn, data=test, ylab=c("IBI"), main="IBI ~ r4mn")
-plot(rd~r4mn, data=test, ylab=c("RD"), main="RD ~ r4mn")
-#father educational level
-is.factor(test$r4pn)
-sum(is.na(test$r4pn))
-levels(test$r4pn)
-summary(test$r4pn)
-test$r4pn[which(test$r4pn == "No sabe")] <- NA
-summary(test$r4pn)
-test <- test[complete.cases(test[,c("r4pn")]),]
-sum(is.na(test$r4pn))
-test$r4pn <- droplevels(test$r4pn)
-summary(test$r4pn)
-summary(aov(s5~r4pn, data=test))
-summary(aov(s6~r4pn, data=test))
-summary(aov(euh~r4pn, data=test))
-summary(aov(ien~r4pn, data=test))
-summary(aov(rd~r4pn, data=test))
-layout(mat = matrix(c(1,1,2,2,3,3,0,4,4,5,5,0), nrow = 2, byrow = TRUE))
-plot(s5~r4pn, data=test, ylab=c("Nº Offs."), main="Nº Offs. ~ r4pn")
-plot(s6~r4pn, data=test, ylab=c("AFR"), main="AFR ~ r4pn")
-plot(euh~r4pn, data=test, ylab=c("ALR"), main="ALR ~ r4pn")
-plot(ien~r4pn, data=test, ylab=c("IBI"), main="IBI ~ r4pn")
-plot(rd~r4pn, data=test, ylab=c("RD"), main="RD ~ r4pn")
 #ethnic group
 is.factor(test$r6)
 sum(is.na(test$r6))
@@ -842,371 +739,228 @@ pairs.panels(test[,c("ESC","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotco
 pairs.panels(test[,c("ESC","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot")], method = "spearman",hist.col = "light grey", density = TRUE,ellipses = F, lm=T, cex=1, main="Spearman correlation")
 summary(aov(ytotcorh~v2+v6+v9+v12+v24+v25+v26, test))
 
-#simple multiple model
-#Nº of Offspring
+#we use region, comuna, and ethnic group to control for the other socioeconomic variables
+
+# #FAMD to get socioeconomic scores (is a PCA for mixed data) -------------
+
+
+#install FactoMineR
+install.packages("FactoMineR")
+library(FactoMineR)
+#FAMD with all the SES variables
+summary(test[,c("pco1","ESC","educ","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot","s14","v1","v2","v4","v6","v9","v11","v12","v23","v24","v25","v26")])
+famd1 <- FAMD(test[,c("pco1","ESC","educ","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot","s14","v1","v2","v4","v6","v9","v11","v12","v23","v24","v25","v26")])
+summary(famd1)
+summary(famd1$var$contrib[,1])
+which(famd1$var$contrib[,1] >= mean(famd1$var$contrib[,1]))
+#FAMD with all the SES variables that contributed equal of higher to the mean
+summary(test[,c("ESC","educ","ytrabajoCorh","yautcorh","ytotcorh","ypchtot","s14","v9","v12")])
+famd2 <- FAMD(test[,c("ESC","educ","ytrabajoCorh","yautcorh","ytotcorh","ypchtot","s14","v9","v12")])
+summary(famd2)
+summary(famd2$var$contrib[,1])
+#check for outliers
+hist(famd2$ind$coord[,1])
+which(famd2$ind$coord[,1]>=15)
+test[which(famd2$ind$coord[,1]>=15),c("folio","edad", "s5", "s6", "euh", "ien","rd","region","comuna","zona","r6","ESC","educ","ytrabajoCorh","yautcorh","ytotcorh","ypchtot","s14","v9","v12")] #"Brachyteles_hypoxanthus"
+#get rid of outlier
+#FAMD without outliers
+famdsub <-famd2$ind$coord[which(famd2$ind$coord[,1]<=20),1]
+hist(famdsub)
+
+
+# #Standarization, socioeconomic score and deciles ------------------------
+
+
+q <- scale(famdsub, center = T, scale = T)
+par(mfrow=c(1,1))
+hist(q)
+range01 <- function(x){(x-min(x))/(max(x)-min(x))}
+final <- test[which(famd2$ind$coord[,1]<=20),c("folio","edad", "s5", "s6", "euh", "ien","rd","region","comuna","zona","r6", "ESC","educ","ytrabajoCorh","yautcorh","ytotcorh","ypchtot","s14","v9","v12")]
+final$ses <- range01(q)
+hist(final$ses, breaks = 100)
+#Quantiles
+final$ses10 <- ntile(final$ses, 10)
+final$ses5 <- ntile(final$ses, 5)
+final$ses4 <- ntile(final$ses, 4)
+final$ses3 <- ntile(final$ses, 3)
+final$ses2 <- ntile(final$ses, 2)
+
+
+# #3.- mixed effect models ----------------------------------------------------
+
+
+#install package lme4
+install.packages("lme4")
+library(lme4)
 #"fitdistrplus" package
 update.packages("fitdistrplus")
 install.packages("fitdistrplus")
 library(fitdistrplus)
-#Nº of Offspring
+
+# #Nº of Offspring --------------------------------------------------------
+
+
 #distribution
 par(mfrow=c(1,1))
-descdist(test$s5, discrete = T, boot = 500)
-fits5 <- fitdist(test$s5, "pois")
+descdist(final$s5, discrete = T, boot = 500)
+fits5 <- fitdist(final$s5, "pois")
 summary(fits5)
 plot(fits5)
-#Poisson regression
-#glm with everything
-glms5 <- glm(s5~region+comuna+zona+pco1+ESC+educ+ytrabajoCorh+yoautCorh+yautcorh+ysubh+ytotcorh+ypchtot+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, data=test, family = poisson(link = "log"))
-summary(glms5)
-par(mfrow=c(2,2))
-plot(glms5)
-#check overdispersion
-install.packages("AER")
-library(AER)
-dispersiontest(glms5,trafo=1)
-step(glms5, direction="both")
-glms5.1 <- glm(s5 ~ pco1 + ESC + ytotcorh + ypchtot, data = test, family = poisson(link = "log"))
-summary(glms5.1)
-par(mfrow=c(2,2))
-plot(glms5.1)
-dispersiontest(glms5.1,trafo=1)
-#glm without total incomes
-glms52 <- glm(s5~region+comuna+zona+pco1+ESC+educ+ytrabajoCorh+yoautCorh+yautcorh+ysubh+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, data=test, family = poisson(link = "log"))
-summary(glms52)
-par(mfrow=c(2,2))
-plot(glms52)
-dispersiontest(glms52,trafo=1)
-step(glms52, direction="both")
-glms52.1 <- glm(s5 ~ region + pco1 + ESC + ytrabajoCorh + ysubh +s14 + v6, family = poisson(link = "log"), data = test)
-summary(glms52.1)
-par(mfrow=c(2,2))
-plot(glms52.1)
-dispersiontest(glms52.1,trafo=1)
-#glma only with total income
-glms53 <- glm(s5~region+comuna+zona+pco1+ESC+educ+ytotcorh+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, data=test, family=poisson(link = "log"))
-summary(glms53)
-par(mfrow=c(2,2))
-plot(glms53)
-dispersiontest(glms53,trafo=1)
-step(glms53, direction="both")
-step(glm(s5 ~ region + zona + pco1 + ESC + educ + ytotcorh + s14 + r4mn +r4pn + r6 + v1 + v2 + v4 + v6 + v9 + v11 + v12 + v23 + v24 +v25 + v26, data=test,family=poisson(link="log")))
-glms53.1 <- glm(formula = s5 ~ pco1 + ESC + ytotcorh + s14 + v6, family = poisson(link = "log"),data = test)
-summary(glms53.1)
-par(mfrow=c(2,2))
-plot(glms53.1)
-dispersiontest(glms53.1,trafo=1)
-#glm only with per capita income
-glms54 <- glm(s5~region+comuna+zona+pco1+ESC+educ+ypchtot+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, data=test, family=poisson(link="log"))
-summary(glms54)
-par(mfrow=c(2,2))
-plot(glms54)
-dispersiontest(glms54,trafo=1)
-step(glms54, direction="both")
-step(glm(s5 ~ region + zona + pco1 + ESC + educ + ypchtot + s14 + r4mn +r4pn + r6 + v1 + v2 + v4 + v6 + v9 + v11 + v12 + v23 + v24 +v25 + v26, data=test,family=poisson(link="log")))
-glms54.1 <- glm(s5 ~ region + pco1 + ESC + ypchtot + v6 + v11,family = poisson(link = "log"), data = test)
-summary(glms54.1)
-par(mfrow=c(2,2))
-plot(glms54.1)
-dispersiontest(glms54.1,trafo=1)
-#Age at first reproduction
+#run a generalized mixed-effect model
+#generalized fixed-effect model
+lmes5.1 <- glm(s5~ses,data=final, family = poisson(link = "log"))
+summary(lmes5.1)
+#generalized mixed-effect model
+lmes5.2 <- glmer(s5~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6),data=final, family = poisson(link = "log"))
+summary(lmes5.2)
+qqnorm(residuals(lmes5))
+
+# #Age at first reproduction ----------------------------------------------
+
+
 #prepare data
-sum(is.na(test$s6))
-tests6 <- test[complete.cases(test$s6),]
+sum(is.na(final$s6))
+finals6 <- final[complete.cases(final$s6),]
 #distribution
 par(mfrow=c(1,1))
-descdist(tests6$s6, discrete = F, boot = 500)
-fits6 <- fitdist(tests6$s6, "lnorm")
+descdist(finals6$s6, discrete = F, boot = 500)
+fits6 <- fitdist(finals6$s6, "lnorm")
 summary(fits6)
 plot(fits6)
-#glm: log-normal
-glms6 <- glm(log(s6)~region+comuna+zona+pco1+ESC+educ+ytrabajoCorh+yoautCorh+yautcorh+ysubh+ytotcorh+ypchtot+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, data=tests6, family = gaussian(link = "identity"))
-summary(glms6)
-par(mfrow=c(2,2))
-plot(glms6)
-step(glms6, direction="both")
-glms6.1 <-  glm(log(s6) ~ pco1 + ESC + educ + ytotcorh + ypchtot +v2 + v6 + v9 + v25 + v26, family = gaussian(link = "identity"),data = tests6)
-summary(glms6.1)
-par(mfrow=c(2,2))
-plot(glms6.1)
-glms6.1.1 <-  glm(log(s6) ~ pco1 + ESC + ytotcorh + ypchtot +v2 + v6 + v9 + v25 + v26, family = gaussian(link = "identity"),data = tests6)
-summary(glms6.1.1)
-par(mfrow=c(2,2))
-plot(glms6.1.1)
-glms6.1.2 <-  glm(log(s6) ~ pco1 + educ + ytotcorh + ypchtot +v2 + v6 + v9 + v25 + v26, family = gaussian(link = "identity"),data = tests6)
-summary(glms6.1.2)
-par(mfrow=c(2,2))
-plot(glms6.1.2)
-#glm without total incomes
-glms62 <- glm(log(s6)~region+comuna+zona+pco1+ESC+educ+ytrabajoCorh+yoautCorh+yautcorh+ysubh+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, data=tests6, family = gaussian(link = "identity"))
-summary(glms62)
-par(mfrow=c(2,2))
-plot(glms62)
-step(glms62, direction="both")
-glms62.1 <- glm(log(s6) ~ pco1 + ESC + educ + ytrabajoCorh + yoautCorh +v2 + v6 + v9 + v25 + v26, family = gaussian(link = "identity"),data = tests6)
-summary(glms62.1)
-par(mfrow=c(2,2))
-plot(glms64)
-glms62.1.1 <- glm(log(s6) ~ pco1 + ESC + ytrabajoCorh + yoautCorh +v2 + v6 + v9 + v25 + v26, family = gaussian(link = "identity"),data = tests6)
-summary(glms62.1.1)
-par(mfrow=c(2,2))
-plot(glms62.1.1)
-glms62.1.2 <- glm(log(s6) ~ pco1 + educ + ytrabajoCorh + yoautCorh +v2 + v6 + v9 + v25 + v26, family = gaussian(link = "identity"),data = tests6)
-summary(glms62.1.2)
-par(mfrow=c(2,2))
-plot(glms62.1.2)
-#glm only with total income
-glms63 <- glm(log(s6)~region+comuna+zona+pco1+ESC+educ+ytotcorh+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = gaussian(link = "identity"),data = tests6)
-summary(glms63)
-par(mfrow=c(2,2))
-plot(glms63)
-step(glms63, direction="both")
-glms63.1 <- glm(log(s6) ~ pco1 + ESC + educ + ytotcorh + v2 + v6 +v9 + v25 + v26, family = gaussian(link = "identity"), data = tests6)
-summary(glms63.1)
-par(mfrow=c(2,2))
-plot(glms63.1)
-glms63.1.1 <- glm(log(s6) ~ pco1 + ESC + ytotcorh + v2 + v6 +v9 + v25 + v26, family = gaussian(link = "identity"), data = tests6)
-summary(glms63.1.1)
-par(mfrow=c(2,2))
-plot(glms63.1.1)
-glms63.1.2 <- glm(log(s6) ~ pco1 + educ + ytotcorh + v2 + v6 +v9 + v25 + v26, family = gaussian(link = "identity"), data = tests6)
-summary(glms63.1.2)
-par(mfrow=c(2,2))
-plot(glms63.1.2)
-#glm only with per capita income
-glms64 <- glm(log(s6)~region+comuna+zona+pco1+ESC+educ+ypchtot+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = gaussian(link = "identity"), data = tests6)
-summary(glms64)
-par(mfrow=c(2,2))
-plot(glms64)
-step(glms64, direction="both")
-glms64.1 <-  glm(log(s6) ~ pco1 + ESC + educ + ypchtot + v2 + v6 +v9 + v25 + v26, family = gaussian(link = "identity"), data = tests6)
-summary(glms64.1)
-par(mfrow=c(2,2))
-plot(glms64.1)
-glms64.1.1 <- glm(log(s6) ~ pco1 + ESC + ypchtot + v2 + v6 +v9 + v25 + v26, family = gaussian(link = "identity"), data = tests6)
-summary(glms64.1.1)
-par(mfrow=c(2,2))
-plot(glms64.1.1)
-glms64.1.2 <- glm(log(s6) ~ pco1 + educ + ypchtot + v2 + v6 +v9 + v25 + v26, family = gaussian(link = "identity"), data = tests6)
-summary(glms64.1.2)
-par(mfrow=c(2,2))
-plot(glms64.1.2)
-#Age at last reproduction
+#run a generalized mixed-effect model
+#generalized fixed-effect model
+lmes6.1 <- glm(log(s6)~ses,data=finals6, family = gaussian(link = "identity"))
+summary(lmes6.1)
+#generalized mixed-effect model
+lmes6.2 <- glmer(log(s6)~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6),data=finals6, family = gaussian(link = "identity"))
+summary(lmes6.2)
+qqnorm(residuals(lmes6))
+
+# #Age at last reproduction -----------------------------------------------
+
+
 #prepare data
-sum(is.na(tests6$euh))
-testeuh <- tests6
+sum(is.na(final$euh))
+finaleuh <- final[complete.cases(final$euh),]
 #distribution
 par(mfrow=c(1,1))
-descdist(testeuh$euh, discrete = F, boot = 500)
-fiteuh <- fitdist(testeuh$euh, "norm")
+descdist(finaleuh$euh, discrete = F, boot = 500)
+fiteuh <- fitdist(finaleuh$euh, "norm")
 summary(fiteuh)
 plot(fiteuh)
-#glm: simple linear
-glmeuh <- glm(euh~region+comuna+zona+pco1+ESC+educ+ytrabajoCorh+yoautCorh+yautcorh+ysubh+ytotcorh+ypchtot+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, data=testeuh, family = gaussian(link = "identity"))
-summary(glmeuh)
-par(mfrow=c(2,2))
-plot(glmeuh)
-step(glmeuh, direction="both")
-glmeuh.1 <- glm(euh ~ educ + ytrabajoCorh + yoautCorh + ysubh +ytotcorh + ypchtot + v9, family = gaussian(link = "identity"),data = testeuh)
-summary(glmeuh.1)
-par(mfrow=c(2,2))
-plot(glmeuh.1)
-#glm without total incomes
-glmeuh2 <- glm(euh~region+comuna+zona+pco1+ESC+educ+ytrabajoCorh+yoautCorh+yautcorh+ysubh+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = gaussian(link = "identity"),data = testeuh)
-summary(glmeuh2)
-par(mfrow=c(2,2))
-plot(glmeuh2)
-step(glmeuh2, direction="both")
-glmeuh2.1 <-glm(euh ~ educ + ytrabajoCorh + ysubh + v9, family = gaussian(link = "identity"),data = testeuh)
-summary(glmeuh2.1)
-par(mfrow=c(2,2))
-plot(glmeuh2.1)
-#glm only with total income
-glmeuh3 <- glm(euh~region+comuna+zona+pco1+ESC+educ+ytotcorh+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = gaussian(link = "identity"),data = testeuh)
-summary(glmeuh3)
-par(mfrow=c(2,2))
-plot(glmeuh3)
-step(glmeuh3, direction="both")
-glmeuh3.1 <- glm(euh ~ educ + ytotcorh + s14 + v9, family = gaussian(link = "identity"),data = testeuh)
-summary(glmeuh3.1)
-par(mfrow=c(2,2))
-plot(glmeuh3.1)
-#glm only with per capita income
-glmeuh4 <- glm(euh~region+comuna+zona+pco1+ESC+educ+ypchtot+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = gaussian(link = "identity"),data = testeuh)
-summary(glmeuh4)
-par(mfrow=c(2,2))
-plot(glmeuh4)
-step(glmeuh4, direction="both")
-glmeuh4.1 <- glm(euh ~ educ + ypchtot + s14 + v9, family = gaussian(link = "identity"),data = testeuh)
-summary(glmeuh4.1)
-par(mfrow=c(2,2))
-plot(glmeuh4.1)
-#Interbirth intervals
+#run a generalized mixed-effect model
+#generalized fixed-effect model
+lmeeuh.1 <- glm(euh~ses, data=finaleuh, family = gaussian(link = "identity"))
+summary(lmeeuh.1)
+#generalized mixed-effect model
+lmeeuh.2 <- glmer(euh~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6), data=finaleuh, family = gaussian(link = "identity"))
+summary(lmeeuh.2)
+qqnorm(residuals(lmeeuh))
+
+# #Interbirth intervals ---------------------------------------------------
+
+
 #prepare data
-sum(is.na(tests6$ien))
-testien <- tests6
-testien[which(testien$ien==0),c("ien")] <- NA
-sum(is.na(testien$ien))
-testien <- testien[complete.cases(testien$ien),]
+sum(is.na(final$ien))
+finalien <- final[complete.cases(final$ien),]
+sum(is.na(finalien$ien))
+finalien[which(finalien$ien==0),c("ien")] <- NA
+sum(is.na(finalien$ien))
+finalien <- finalien[complete.cases(finalien$ien),]
+sum(is.na(finalien$ien))
 #distribution
 par(mfrow=c(1,1))
-descdist(testien$ien, discrete = F, boot = 500)
-fitien <- fitdist(testien$ien, "gamma")
+descdist(finalien$ien, discrete = F, boot = 500)
+fitien <- fitdist(finalien$ien, "gamma")
 summary(fitien)
 plot(fitien)
-#glm: gamma
-glmien <- glm(ien~region+comuna+zona+pco1+ESC+educ+ytrabajoCorh+yoautCorh+yautcorh+ysubh+ytotcorh+ypchtot+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, data=testien, family = Gamma(link = "inverse"))
-summary(glmien)
-par(mfrow=c(2,2))
-plot(glmien)
-step(glmien, direction="both")
-glmien.1 <- glm(formula = ien ~ pco1 + ESC + ytrabajoCorh + ypchtot + v6 + region + ethnic, family = Gamma(link = "inverse"), data = testien)
-summary(glmien.1)
-par(mfrow=c(2,2))
-plot(glmien.1)
-#glm without total incomes
-glmien2 <- glm(ien~region+comuna+zona+pco1+ESC+educ+ytrabajoCorh+yoautCorh+yautcorh+ysubh+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = Gamma(link = "inverse"), data = testien)
-summary(glmien2)
-par(mfrow=c(2,2))
-plot(glmien2)
-step(glmien2, direction="both")
-glmien2.1 <-glm(ien ~ pco1 + ESC + ytrabajoCorh + v6 + region +ethnic, family = Gamma(link = "inverse"), data = testien)
-summary(glmien2.1)
-par(mfrow=c(2,2))
-plot(glmien2.1)
-#glm only with total income
-glmien3 <- glm(ien~region+comuna+zona+pco1+ESC+educ+ytotcorh+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = Gamma(link = "inverse"), data = testien)
-summary(glmien3)
-par(mfrow=c(2,2))
-plot(glmien3)
-step(glmien3, direction="both")
-glmien3.1 <- glm(formula = ien ~ pco1 + ESC + ytotcorh + v6 + region + ethnic,family = Gamma(link = "inverse"), data = testien)
-summary(glmien3.1)
-par(mfrow=c(2,2))
-plot(glmien3.1)
-#glm only with per capita income
-glmien4 <- glm(ien~region+comuna+zona+pco1+ESC+educ+ypchtot+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26,family = Gamma(link = "inverse"), data = testien)
-summary(glmien4)
-par(mfrow=c(2,2))
-plot(glmien4)
-step(glmien4, direction="both")
-glmien4.1 <- glm(formula = ien ~ pco1 + ESC + ypchtot + v6 + region + ethnic,family = Gamma(link = "inverse"), data = testien)
-summary(glmien4.1)
-par(mfrow=c(2,2))
-plot(glmien4.1)
-#Parity degree
+#run a generalized mixed-effect model
+#generalized fixed-effect model
+lmeien.1 <- glm(ien~ses, data=finalien, family = Gamma(link = "identity"))
+summary(lmeien.1)
+#generalized mixed-effect model
+lmeien.2 <- glmer(ien~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6), data=finalien, family = Gamma(link = "identity"))
+summary(lmeien.2)
+qqnorm(residuals(lmeien))
+
+# #Modes of parity --------------------------------------------------------
+
+
 #prepare data
-sum(is.na(testien$rd))
-testrd <- testien
+sum(is.na(final$rd))
+finalrd <- final[complete.cases(final$rd),]
+sum(is.na(finalrd$rd))
+finalrd[which(finalrd$rd==0),c("rd")] <- NA
+sum(is.na(finalrd$rd))
+finalrd <- finalrd[complete.cases(finalrd$rd),]
+sum(is.na(finalrd$rd))
 #distribution
 par(mfrow=c(1,1))
-descdist(testrd$rd, discrete = F, boot = 500)
-fitrd <- fitdist(testrd$rd, "lnorm")
+descdist(finalrd$rd, discrete = F, boot = 500)
+fitrd <- fitdist(finalrd$rd, "lnorm")
 summary(fitrd)
 plot(fitrd)
-#glm: log-normal
-glmrd <- glm(log(rd)~region+comuna+zona+pco1+ESC+educ+ytrabajoCorh+yoautCorh+yautcorh+ysubh+ytotcorh+ypchtot+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, data=testrd, family = gaussian(link = "identity"))
-summary(glmrd)
-par(mfrow=c(2,2))
-plot(glmrd)
-step(glmrd, direction="both")
-glmrd.1 <- glm(log(rd) ~ pco1 + ESC + ytrabajoCorh + v6 + region +ethnic, family = gaussian(link = "identity"), data = testrd)
-summary(glmrd.1)
-par(mfrow=c(2,2))
-plot(glmrd.1)
-#glm without total incomes
-glmrd2 <- glm(log(rd)~region+comuna+zona+pco1+ESC+educ+ytrabajoCorh+yoautCorh+yautcorh+ysubh+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = gaussian(link = "identity"), data = testrd)
-summary(glmrd2)
-par(mfrow=c(2,2))
-plot(glmrd2)
-step(glmrd2, direction="both")
-glmrd2.1 <-glm(log(rd) ~ pco1 + ESC + ytrabajoCorh + v6 + region +ethnic, family = gaussian(link = "identity"), data = testrd)
-summary(glmrd2.1)
-par(mfrow=c(2,2))
-plot(glmrd2.1)
-#glm only with total income
-glmrd3 <- glm(log(rd)~region+comuna+zona+pco1+ESC+educ+ytotcorh+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = gaussian(link = "identity"), data = testrd)
-summary(glmrd3)
-par(mfrow=c(2,2))
-plot(glmrd3)
-step(glmrd3, direction="both")
-glmrd3.1 <- glm(log(rd) ~ pco1 + ESC + ytotcorh + v6 + region +ethnic, family = gaussian(link = "identity"), data = testrd)
-summary(glmrd3.1)
-par(mfrow=c(2,2))
-plot(glmrd3.1)
-#glm only with per capita income
-glmrd4 <- glm(log(rd)~region+comuna+zona+pco1+ESC+educ+ypchtot+s14+r4mn+r4pn+r6+ethnic+v1+v2+v4+v6+v9+v11+v12+v23+v24+v25+v26, family = gaussian(link = "identity"), data = testrd)
-summary(glmrd4)
-par(mfrow=c(2,2))
-plot(glmrd4)
-step(glmrd4, direction="both")
-glmrd4.1 <- glm(log(rd) ~ pco1 + ESC + ypchtot + v6 + region +ethnic, family = gaussian(link = "identity"), data = testrd)
-summary(glmrd4.1)
-par(mfrow=c(2,2))
-plot(glmrd4.1)
+#run a generalized mixed-effect model
+#generalized fixed-effect model
+lmerd.1 <- glm(log(rd)~ses, data=finalrd, family = gaussian(link = "identity"))
+summary(lmerd.1)
+#generalized mixed-effect model
+lmerd.2 <- glmer(log(rd)~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6), data=finalrd, family = gaussian(link = "identity"))
+summary(lmerd.2)
+qqnorm(residuals(lmerd))
 
-#model selection
-#AIC
-#Nº of Offspring
-AIC(glms5.1,glms52.1,glms53.1,glms54.1)
-#model selected: glms54.1 but glms5.1 has the lowest
-#Age at first reproduction
-AIC(glms6.1,glms6.1.1,glms6.1.2,glms62.1,glms62.1.1,glms62.1.2,glms63.1,glms63.1.1,glms63.1.2,glms64.1,glms64.1.1,glms64.1.2)
-#model selected: glms63.1.2 but glms6.1 has the lowest
-#Age at last reproduction
-AIC(glmeuh.1,glmeuh2.1,glmeuh3.1,glmeuh4.1)
-#model selected: glmeuh2.1 but glmeuh.1 has the lowest
-#Interbirth interval
-AIC(glmien.1,glmien2.1,glmien3.1,glmien4.1)
-#model selected: glmien2.1 but glmien.1 has the lowest
-#Parity degree
-AIC(glmrd.1,glmrd2.1,glmrd3.1,glmrd4.1)
-#model selected: glmrd.1 because is the same as glmrd2.1
-#VIF
-#install car package
-install.packages("car")
-library(car)
-#check vif
-#Nº of Offspring
-vif(glms5.1)
-vif(glms54.1)
-#model selected: glms54.1
-summary(glms54.1)
-Anova(glms54.1)
-#Age at first reproduction
-vif(glms6.1)
-vif(glms63.1.2)
-#model selected: glms63.1.2
-summary(glms63.1.2)
-Anova(glms63.1.2)
-#Age at last reproduction
-vif(glmeuh.1)
-vif(glmeuh2.1)
-#model selected: glmeuh2.1
-summary(glmeuh2.1)
-Anova(glmeuh2.1)
-#Interbirth intervals
-vif(glmien.1)
-vif(glmien2.1)
-#model selected: glmien2.1
-summary(glmien2.1)
-Anova(glmien2.1)
-#Parity degree
-vif(glmrd.1)
-summary(glmrd.1)
-Anova(glmrd.1)
 
-#plotting
-#Nº of Offspring
-crPlots(glms54.1)
-#Age at first reproduction
-crPlots(glms63.1.2)
-#Age at last reproduction
-crPlots(glmeuh2.1)
-#Interbirth interval
-crPlots(glmien2.1)
-#Parity degree
-crPlots(glmrd.1)
+# #let's do the plots -----------------------------------------------------
+
+
+#install ggeffects package
+install.packages("ggeffects")
+library(ggeffects)
+#plot
+
+# #Nº of offspring --------------------------------------------------------
+
+
+#predicted values
+preds5 <- final
+preds5$preds <- predict(lmes5, type="response")
+preds5 <- preds5[with(preds5,order(zona,ses)),]
+#plot
+ggplot(preds5, aes(x = ses, y = preds, colour=zona)) +
+  geom_point(aes(y = s5), alpha=.5, position=position_jitter(h=.2)) +
+  geom_line(size = 1)
+#comuna
+ggplot(final, aes(x=ses, y=s5)) +
+  geom_point() +
+  geom_line(aes(y=predict(lmes5), group=comuna, colour=comuna))+
+  theme_classic()
+#region
+ggplot(final, aes(x=ses, y=s5)) +
+  geom_point()+
+  geom_line(aes(y=predict(lmes5), group=region, colour=region))+
+  ylim(0,11)+
+  theme_classic()
+#zona
+ggplot(final, aes(x=ses, y=s5)) +
+  geom_point() +
+  geom_line(aes(y=predict(lmes5),colour=zona))+
+  theme_classic()
+#r6
+ggplot(final, aes(x=ses, y=s5)) +
+  geom_point() +
+  geom_line(aes(y=predict(lmes5), group=r6, colour=r6))+
+  theme_classic()
+using ggpredict
+preds5 <- ggpredict(lmes5, type="re")
+#plot
+ggplot(preds5$ses,aes(x,predicted))+
+  geom_line() +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = .1)+
+  ylim(0,11)+
+  theme_classic()
+
+# #former code...useful for recycle ---------------------------------------
+
 
 # #R packages to use
 # #Package FactoMineR
