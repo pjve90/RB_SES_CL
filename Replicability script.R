@@ -739,7 +739,7 @@ pairs.panels(test[,c("ESC","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotco
 pairs.panels(test[,c("ESC","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot")], method = "spearman",hist.col = "light grey", density = TRUE,ellipses = F, lm=T, cex=1, main="Spearman correlation")
 summary(aov(ytotcorh~v2+v6+v9+v12+v24+v25+v26, test))
 
-#we use region, comuna, and ethnic group to control for the other socioeconomic variables
+#we use region, zona, and ethnic group to control for the other socioeconomic variables
 
 # #FAMD to get socioeconomic scores (is a PCA for mixed data) -------------
 
@@ -775,7 +775,7 @@ q <- scale(famdsub, center = T, scale = T)
 par(mfrow=c(1,1))
 hist(q)
 range01 <- function(x){(x-min(x))/(max(x)-min(x))}
-final <- test[which(famd2$ind$coord[,1]<=20),c("folio","edad", "s5", "s6", "euh", "ien","rd","region","comuna","zona","r6", "ESC","educ","ytrabajoCorh","yautcorh","ytotcorh","ypchtot","s14","v9","v12")]
+final <- test[which(famd2$ind$coord[,1]<=20),c("folio","edad", "s5", "s6", "euh", "ien","rd","region","comuna","zona","r6","ethnic", "ESC","educ","ytrabajoCorh","yautcorh","ytotcorh","ypchtot","s14","v9","v12")]
 final$ses <- range01(q)
 hist(final$ses, breaks = 100)
 #Quantiles
@@ -807,13 +807,25 @@ fits5 <- fitdist(final$s5, "pois")
 summary(fits5)
 plot(fits5)
 #run a generalized mixed-effect model
-#generalized fixed-effect model
+#Poisson regression only with ses
 lmes5.1 <- glm(s5~ses,data=final, family = poisson(link = "log"))
 summary(lmes5.1)
-#generalized mixed-effect model
-lmes5.2 <- glmer(s5~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6),data=final, family = poisson(link = "log"))
+#Poisson regression with multiple variables
+lmes5.2 <- glm(s5~ses+region+zona+ethnic,data=final, family = poisson(link = "log"))
 summary(lmes5.2)
-qqnorm(residuals(lmes5))
+#Poisson regression with multiple variables after step AIC
+step(lmes5.2, direction="both")
+lmes5.3 <- glm(s5~ses+region+zona,data=final, family = poisson(link = "log"))
+summary(lmes5.3)
+#generalized Poisson mixed-effect model
+lmes5.4 <- glmer(s5~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic),data=final, family = poisson(link = "log"))
+summary(lmes5.4)
+#generalized Poisson mixed-effect model with step AIC
+lmes5.5 <- glmer(s5~ses+(1+ses|region)+(1+ses|zona),data=final, family = poisson(link = "log"))
+summary(lmes5.5)
+#AIC
+AIC(lmes5.1,lmes5.2,lmes5.3,lmes5.4, lmes5.5)
+#lmes5.3 is the best model
 
 # #Age at first reproduction ----------------------------------------------
 
@@ -824,17 +836,29 @@ finals6 <- final[complete.cases(final$s6),]
 #distribution
 par(mfrow=c(1,1))
 descdist(finals6$s6, discrete = F, boot = 500)
-fits6 <- fitdist(finals6$s6, "lnorm")
+fits6 <- fitdist(log(finals6$s6), "norm")
 summary(fits6)
 plot(fits6)
 #run a generalized mixed-effect model
-#generalized fixed-effect model
-lmes6.1 <- glm(log(s6)~ses,data=finals6, family = gaussian(link = "identity"))
+#simple linear regression model
+lmes6.1 <- lm(log(s6)~ses,data=finals6)
 summary(lmes6.1)
-#generalized mixed-effect model
-lmes6.2 <- glmer(log(s6)~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6),data=finals6, family = gaussian(link = "identity"))
+#multiple linear regression model
+lmes6.2 <- lm(log(s6)~ses+region+zona+ethnic,data=finals6)
 summary(lmes6.2)
-qqnorm(residuals(lmes6))
+#multiple linear regression model with multiple variables after step AIC
+step(lmes6.2, direction="both")
+lmes6.3 <- lm(log(s6)~ses+region+zona,data=finals6)
+summary(lmes6.3)
+#generalized mixed-effect model
+lmes6.4 <- lmer(log(s6)~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic),data=finals6)
+summary(lmes6.4)
+#generalized mixed-effect model with step AIC variables
+lmes6.5 <- lmer(log(s6)~ses+(1+ses|region)+(1+ses|zona),data=finals6)
+summary(lmes6.5)
+#AIC
+AIC(lmes6.1,lmes6.2,lmes6.3, lmes6.4, lmes6.5)
+#lmes6.3 is the best model
 
 # #Age at last reproduction -----------------------------------------------
 
@@ -849,13 +873,21 @@ fiteuh <- fitdist(finaleuh$euh, "norm")
 summary(fiteuh)
 plot(fiteuh)
 #run a generalized mixed-effect model
-#generalized fixed-effect model
-lmeeuh.1 <- glm(euh~ses, data=finaleuh, family = gaussian(link = "identity"))
+#simple linear regression model
+lmeeuh.1 <- lm(euh~ses, data=finaleuh)
 summary(lmeeuh.1)
-#generalized mixed-effect model
-lmeeuh.2 <- glmer(euh~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6), data=finaleuh, family = gaussian(link = "identity"))
+#multiple linear regression model
+lmeeuh.2 <- lm(euh~ses+region+zona+ethnic, data=finaleuh)
 summary(lmeeuh.2)
-qqnorm(residuals(lmeeuh))
+#model with multiple variables after step AIC
+step(lmeeuh.2, direction="both")
+#step model same as lmeeuh.1
+#generalized mixed-effect model
+lmeeuh.3 <- lmer(euh~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic), data=finaleuh)
+summary(lmeeuh.3)
+#AIC
+AIC(lmeeuh.1,lmeeuh.2,lmeeuh.3)
+#lmeeuh.1 is the best model
 
 # #Interbirth intervals ---------------------------------------------------
 
@@ -875,16 +907,27 @@ fitien <- fitdist(finalien$ien, "gamma")
 summary(fitien)
 plot(fitien)
 #run a generalized mixed-effect model
-#generalized fixed-effect model
+#Gamma regression model
 lmeien.1 <- glm(ien~ses, data=finalien, family = Gamma(link = "identity"))
 summary(lmeien.1)
-#generalized mixed-effect model
-lmeien.2 <- glmer(ien~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6), data=finalien, family = Gamma(link = "identity"))
+#Gamma regression model with multiple variables
+lmeien.2 <- glm(ien~ses+region+zona+ethnic, data=finalien, family = Gamma(link = "identity"))
 summary(lmeien.2)
-qqnorm(residuals(lmeien))
+#Gamma regression model with multiple variables after step AIC
+step(lmeien.2, direction="both")
+lmeien.3 <- glm(ien~ses+region, data=finalien, family = Gamma(link = "identity"))
+summary(lmeien.3)
+#Gamma mixed-effect model
+lmeien.4 <- glmer(ien~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic), data=finalien, family = Gamma(link = "identity"))
+summary(lmeien.4)
+#Gamma mixed-effect model with step AIC
+lmeien.5 <- glmer(ien~ses+(1+ses|region), data=finalien, family = Gamma(link = "identity"))
+summary(lmeien.5)
+#AIC
+AIC(lmeien.1,lmeien.2,lmeien.3,lmeien.4, lmeien.5)
+#lmeien.5 is the best model
 
 # #Modes of parity --------------------------------------------------------
-
 
 #prepare data
 sum(is.na(final$rd))
@@ -896,68 +939,106 @@ finalrd <- finalrd[complete.cases(finalrd$rd),]
 sum(is.na(finalrd$rd))
 #distribution
 par(mfrow=c(1,1))
-descdist(finalrd$rd, discrete = F, boot = 500)
-fitrd <- fitdist(finalrd$rd, "lnorm")
+descdist(log(finalrd$rd), discrete = F, boot = 500)
+fitrd <- fitdist(log(finalrd$rd), "norm")
 summary(fitrd)
 plot(fitrd)
 #run a generalized mixed-effect model
-#generalized fixed-effect model
-lmerd.1 <- glm(log(rd)~ses, data=finalrd, family = gaussian(link = "identity"))
+#simple linear regression model
+lmerd.1 <- lm(log(rd)~ses, data=finalrd)
 summary(lmerd.1)
-#generalized mixed-effect model
-lmerd.2 <- glmer(log(rd)~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6), data=finalrd, family = gaussian(link = "identity"))
+#multiple linear regression model
+lmerd.2 <- lm(log(rd)~ses+region+zona+ethnic, data=finalrd)
 summary(lmerd.2)
-qqnorm(residuals(lmerd))
+#multiple linear regression model with multiple variables after step AIC
+step(lmerd.2, direction="both")
+lmerd.3 <- lm(log(rd)~ses+region,data=finalrd)
+summary(lmerd.3)
+#Multiple linear mixed-effect model
+lmerd.4 <- lmer(log(rd)~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic), data=finalrd)
+summary(lmerd.4)
+#Multiple linear mixed-effect model with step AIC
+lmerd.5 <- lmer(log(rd)~ses+(1+ses|region), data=finalrd)
+summary(lmerd.5)
+#AIC
+AIC(lmerd.1,lmerd.2,lmerd.3,lmerd.4,lmerd.5)
+#lmerd.3 are the best model
 
-
-# #let's do the plots -----------------------------------------------------
+# #4.- let's do the plots -----------------------------------------------------
 
 
 #install ggeffects package
 install.packages("ggeffects")
 library(ggeffects)
-#plot
 
 # #Nº of offspring --------------------------------------------------------
 
-
-#predicted values
-preds5 <- final
-preds5$preds <- predict(lmes5.2, type="response")
-preds5 <- preds5[with(preds5,order(zona,ses)),]
-#plot
-ggplot(preds5, aes(x = ses, y = preds, colour=zona)) +
-  geom_point(aes(y = s5), alpha=.5, position=position_jitter(h=.2)) +
-  geom_line(size = 1)
-#comuna
-ggplot(final, aes(x=ses, y=s5)) +
-  geom_point() +
-  geom_line(aes(y=predict(lmes5.2), group=comuna, colour=comuna))+
-  theme_classic()
-#region
-ggplot(final, aes(x=ses, y=s5)) +
+#overall model
+ggplot(final,aes(x=ses, y=s5)) +
   geom_point()+
-  geom_line(aes(y=predict(lmes5.2), group=region, colour=region))+
-  ylim(0,11)+
+  geom_smooth(method="glm",method.args=list(family=poisson), se=T) +
   theme_classic()
 #zona
-ggplot(final, aes(x=ses, y=s5)) +
-  geom_point() +
-  geom_line(aes(y=predict(lmes5.2),colour=zona))+
+ggplot(final,aes(x=ses, y=s5, colour=zona)) +
+  geom_point()+
+  geom_smooth(method="glm",method.args=list(family=poisson), se=F) +
   theme_classic()
-#r6
-ggplot(final, aes(x=ses, y=s5)) +
-  geom_point() +
-  geom_line(aes(y=predict(lmes5.2), group=r6, colour=r6))+
+#region
+ggplot(final,aes(x=ses, y=s5, colour=region)) +
+  geom_point()+
+  geom_smooth(method="glm",method.args=list(family=poisson), se=F) +
   theme_classic()
 
-#using ggpredict
-preds5 <- ggpredict(lmes5.2, type="re")
-#plot
-ggplot(preds5$ses,aes(x,predicted))+
-  geom_line() +
-  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = .1)+
-  ylim(0,11)+
+# #Age at first reproduction --------------------------------------------------------
+
+#overall model
+ggplot(finals6,aes(x=ses, y=s6)) +
+  geom_point()+
+  geom_smooth(method="lm", se=T) +
+  theme_classic()
+#zona
+ggplot(finals6,aes(x=ses, y=s6, colour=zona)) +
+  geom_point()+
+  geom_smooth(method="lm", se=F) +
+  theme_classic()
+#region
+ggplot(finals6,aes(x=ses, y=s6, colour=region)) +
+  geom_point()+
+  geom_smooth(method="lm", se=F) +
+  theme_classic()
+
+# #Age at last reproduction --------------------------------------------------------
+
+#overall model
+ggplot(finaleuh,aes(x=ses, y=euh)) +
+  geom_point()+
+  geom_smooth(method="lm", se=T) +
+  theme_classic()
+
+# #Interbirth interval --------------------------------------------------------
+
+#overall model
+ggplot(finalien,aes(x=ses, y=ien)) +
+  geom_point()+
+  geom_smooth(method="glm",method.args=list(family=Gamma), se=T) +
+  theme_classic()
+#region
+ggplot(finalien,aes(x=ses, y=ien, colour=region)) +
+  geom_point()+
+  geom_smooth(method="glm",method.args=list(family=Gamma), se=F) +
+  theme_classic()
+
+# #Degree of parity --------------------------------------------------------
+
+#overall model
+ggplot(finalrd,aes(ses,rd))+
+  geom_point()+
+  geom_smooth(method="lm", se=T) +
+  theme_classic()
+#region
+ggplot(finalrd,aes(x=ses, y=rd, colour=region)) +
+  geom_point()+
+  geom_smooth(method="lm", se=F) +
   theme_classic()
 
 # #former code...useful for recycle ---------------------------------------
