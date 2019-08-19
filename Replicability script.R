@@ -786,7 +786,7 @@ final$ses3 <- ntile(final$ses, 3)
 final$ses2 <- ntile(final$ses, 2)
 
 
-# #3.- mixed effect models ----------------------------------------------------
+# #3.- Regression models ----------------------------------------------------
 
 
 #install package lme4
@@ -796,6 +796,12 @@ library(lme4)
 update.packages("fitdistrplus")
 install.packages("fitdistrplus")
 library(fitdistrplus)
+#"boot" package
+install.packages("boot")
+library(boot)
+#"AER" package
+install.packages("AER")
+library(AER)
 
 # #Nº of Offspring --------------------------------------------------------
 
@@ -826,9 +832,32 @@ summary(lmes5.5)
 #AIC
 AIC(lmes5.1,lmes5.2,lmes5.3,lmes5.4, lmes5.5)
 #lmes5.3 is the best model
+glm.diag.plots(lmes5.3)
+dispersiontest(lmes5.3)
+#overdispersed!
+#Negative binomial regression models
+#Poisson regression only with ses
+nblmes5.1 <- glm.nb(s5~ses,data=final)
+summary(nblmes5.1)
+#Poisson regression with multiple variables
+nblmes5.2 <- glm.nb(s5~ses+region+zona+ethnic,data=final)
+summary(nblmes5.2)
+#Poisson regression with multiple variables after step AIC
+step(nblmes5.2, direction="both")
+nblmes5.3 <- glm.nb(s5~ses+region+zona,data=final)
+summary(nblmes5.3)
+#generalized Poisson mixed-effect model
+nblmes5.4 <- glmer.nb(s5~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic),data=final)
+summary(nblmes5.4)
+#generalized Poisson mixed-effect model with step AIC
+nblmes5.5 <- glmer.nb(s5~ses+(1+ses|region)+(1+ses|zona),data=final)
+summary(nblmes5.5)
+#AIC
+AIC(nblmes5.1,nblmes5.2,nblmes5.3,nblmes5.4,nblmes5.5)
+#nblmes5.3 is the best model
+glm.diag.plots(nblmes5.3)
 
 # #Age at first reproduction ----------------------------------------------
-
 
 #prepare data
 sum(is.na(final$s6))
@@ -859,6 +888,8 @@ summary(lmes6.5)
 #AIC
 AIC(lmes6.1,lmes6.2,lmes6.3, lmes6.4, lmes6.5)
 #lmes6.3 is the best model
+par(mfrow=c(2,2))
+plot(lmes6.3)
 
 # #Age at last reproduction -----------------------------------------------
 
@@ -888,6 +919,8 @@ summary(lmeeuh.3)
 #AIC
 AIC(lmeeuh.1,lmeeuh.2,lmeeuh.3)
 #lmeeuh.1 is the best model
+par(mfrow=c(2,2))
+plot(lmeeuh.1)
 
 # #Interbirth intervals ---------------------------------------------------
 
@@ -926,6 +959,7 @@ summary(lmeien.5)
 #AIC
 AIC(lmeien.1,lmeien.2,lmeien.3,lmeien.4, lmeien.5)
 #lmeien.5 is the best model
+plot(lmeien.5)
 
 # #Modes of parity --------------------------------------------------------
 
@@ -963,6 +997,7 @@ summary(lmerd.5)
 #AIC
 AIC(lmerd.1,lmerd.2,lmerd.3,lmerd.4,lmerd.5)
 #lmerd.3 are the best model
+plot(lmerd.3)
 
 # #4.- let's do the plots -----------------------------------------------------
 
@@ -1028,7 +1063,7 @@ ggplot(finalien,aes(x=ses, y=ien, colour=region)) +
   geom_smooth(method="glm",method.args=list(family=Gamma), se=F) +
   theme_classic()
 
-# #Degree of parity --------------------------------------------------------
+# #Modes of parity --------------------------------------------------------
 
 #overall model
 ggplot(finalrd,aes(ses,rd))+
