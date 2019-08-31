@@ -761,7 +761,7 @@ summary(famd2$var$contrib[,1])
 #check for outliers
 hist(famd2$ind$coord[,1])
 which(famd2$ind$coord[,1]>=15)
-test[which(famd2$ind$coord[,1]>=15),c("folio","edad", "s5", "s6", "euh", "ien","rd","region","comuna","zona","r6","ESC","educ","ytrabajoCorh","yautcorh","ytotcorh","ypchtot","s14","v9","v12")] #"Brachyteles_hypoxanthus"
+test[which(famd2$ind$coord[,1]>=15),c("folio","edad", "s5", "s6", "euh", "ien","rd","region","comuna","zona","r6","ESC","educ","ytrabajoCorh","yautcorh","ytotcorh","ypchtot","s14","v9","v12")]
 #get rid of outlier
 #FAMD without outliers
 famdsub <-famd2$ind$coord[which(famd2$ind$coord[,1]<=20),1]
@@ -777,6 +777,7 @@ hist(q)
 range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 final <- test[which(famd2$ind$coord[,1]<=20),c("folio","edad", "s5", "s6", "euh", "ien","rd","region","comuna","zona","r6","ethnic", "ESC","educ","ytrabajoCorh","yautcorh","ytotcorh","ypchtot","s14","v9","v12")]
 final$ses <- range01(q)
+final$ses <- as.vector(final$ses)
 hist(final$ses, breaks = 100)
 #Quantiles
 final$ses10 <- ntile(final$ses, 10)
@@ -893,7 +894,6 @@ plot(lmes6.3)
 
 # #Age at last reproduction -----------------------------------------------
 
-
 #prepare data
 sum(is.na(final$euh))
 finaleuh <- final[complete.cases(final$euh),]
@@ -961,7 +961,7 @@ AIC(lmeien.1,lmeien.2,lmeien.3,lmeien.4, lmeien.5)
 #lmeien.5 is the best model
 plot(lmeien.5)
 
-# #Modes of parity --------------------------------------------------------
+# Reproductive density --------------------------------------------------------
 
 #prepare data
 sum(is.na(final$rd))
@@ -1005,6 +1005,8 @@ plot(lmerd.3)
 #install ggeffects package
 install.packages("ggeffects")
 library(ggeffects)
+#colorblind palette
+cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 # #Nº of offspring --------------------------------------------------------
 
@@ -1026,28 +1028,26 @@ ggplot(final,aes(x=ses, y=s5, colour=region)) +
 
 # #Age at first reproduction --------------------------------------------------------
 
-#overall model
-ggplot(finals6,aes(x=ses, y=s6)) +
-  geom_point()+
-  geom_smooth(method="lm", se=T) +
-  theme_classic()
-#zona
-ggplot(finals6,aes(x=ses, y=s6, colour=zona)) +
-  geom_point()+
-  geom_smooth(method="lm", se=F) +
-  theme_classic()
-#region
-ggplot(finals6,aes(x=ses, y=s6, colour=region)) +
-  geom_point()+
-  geom_smooth(method="lm", se=F) +
-  theme_classic()
+colourCount = length(unique(finals6$region))
+getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
 
+#overall model
+ggplot(finals6, aes(x=ses,y=log(s6),colour=region)) +
+  geom_point()+
+  geom_smooth(method="lm", se=F) +
+  facet_grid(.~zona, margins=T)+
+  theme(legend.position = "bottom",legend.key = element_blank(),panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "grey")) +
+  scale_colour_manual(values = getPalette(colourCount))+
+  labs(x="Socioeconomic position",y="log(AFR)",colour="Region")+
+  guides(colour = guide_legend(title.position = "top"))
+  
 # #Age at last reproduction --------------------------------------------------------
 
 #overall model
 ggplot(finaleuh,aes(x=ses, y=euh)) +
   geom_point()+
   geom_smooth(method="lm", se=T) +
+  labs(x="SEP",y="ALR")+
   theme_classic()
 
 # #Interbirth interval --------------------------------------------------------
@@ -1063,18 +1063,19 @@ ggplot(finalien,aes(x=ses, y=ien, colour=region)) +
   geom_smooth(method="glm",method.args=list(family=Gamma), se=F) +
   theme_classic()
 
-# #Modes of parity --------------------------------------------------------
+# Reproductive density --------------------------------------------------------
+
+colourCount = length(unique(finalrd$region))
+getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
 
 #overall model
-ggplot(finalrd,aes(ses,rd))+
-  geom_point()+
-  geom_smooth(method="lm", se=T) +
-  theme_classic()
-#region
-ggplot(finalrd,aes(x=ses, y=rd, colour=region)) +
+ggplot(finalrd,aes(ses,log(rd),colour=region))+
   geom_point()+
   geom_smooth(method="lm", se=F) +
-  theme_classic()
+  theme(legend.position = "bottom",legend.key = element_blank(),panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "grey")) +
+  scale_colour_manual(values = getPalette(colourCount))+
+  labs(x="Socioeconomic position",y="log(RD)",colour="Region")+
+  guides(colour = guide_legend(title.position = "top"))
 
 # #former code...useful for recycle ---------------------------------------
 
