@@ -1005,8 +1005,18 @@ plot(lmerd.3)
 #install ggeffects package
 install.packages("ggeffects")
 library(ggeffects)
+#install RColorBrewer
+install.packages("RColorBrewer")
+library(RColorBrewer)
+#install ggsci
+install.packages("ggsci")
+library(ggsci)
+#install ggpubr
+install.packages("ggpubr")
+library(ggpubr)
+
 #colorblind palette
-cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+cbp1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73","#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 # #Nº of offspring --------------------------------------------------------
 
@@ -1030,6 +1040,7 @@ ggplot(final,aes(x=ses, y=s5, colour=region)) +
 
 colourCount = length(unique(finals6$region))
 getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
+levels(finals6$zona)[levels(finals6$zona)=="Urbano"] <- "Urban"
 
 #overall model
 ggplot(finals6, aes(x=ses,y=log(s6),colour=region)) +
@@ -1040,14 +1051,14 @@ ggplot(finals6, aes(x=ses,y=log(s6),colour=region)) +
   scale_colour_manual(values = getPalette(colourCount))+
   labs(x="Socioeconomic position",y="log(AFR)",colour="Region")+
   guides(colour = guide_legend(title.position = "top"))
-  
+
 # #Age at last reproduction --------------------------------------------------------
 
 #overall model
 ggplot(finaleuh,aes(x=ses, y=euh)) +
   geom_point()+
   geom_smooth(method="lm", se=T) +
-  labs(x="SEP",y="ALR")+
+  labs(x="Socioeconomic position",y="ALR")+
   theme_classic()
 
 # #Interbirth interval --------------------------------------------------------
@@ -1063,7 +1074,7 @@ ggplot(finalien,aes(x=ses, y=ien, colour=region)) +
   geom_smooth(method="glm",method.args=list(family=Gamma), se=F) +
   theme_classic()
 
-# Reproductive density --------------------------------------------------------
+# Birth density --------------------------------------------------------
 
 colourCount = length(unique(finalrd$region))
 getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
@@ -1074,7 +1085,7 @@ ggplot(finalrd,aes(ses,log(rd),colour=region))+
   geom_smooth(method="lm", se=F) +
   theme(legend.position = "bottom",legend.key = element_blank(),panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "grey")) +
   scale_colour_manual(values = getPalette(colourCount))+
-  labs(x="Socioeconomic position",y="log(RD)",colour="Region")+
+  labs(x="Socioeconomic position",y="log(BD)",colour="Region")+
   guides(colour = guide_legend(title.position = "top"))
 
 # #former code...useful for recycle ---------------------------------------
