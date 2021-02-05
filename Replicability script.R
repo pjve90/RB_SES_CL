@@ -1011,6 +1011,12 @@ library(RColorBrewer)
 #install ggsci
 install.packages("ggsci")
 library(ggsci)
+<<<<<<< HEAD
+=======
+#install ggpubr
+install.packages("ggpubr")
+library(ggpubr)
+>>>>>>> ea1a1d689169bf76c65dc6da0301695b6a055c62
 
 #colorblind palette
 cbp1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73","#F0E442", "#0072B2", "#D55E00", "#CC79A7")
@@ -1035,8 +1041,14 @@ ggplot(final,aes(x=ses, y=s5, colour=region)) +
 
 # #Age at first reproduction --------------------------------------------------------
 
+<<<<<<< HEAD
 colourCount = length(unique(finals6$zona))
 getPalette = colorRampPalette(brewer.pal(2, "RdYlBu"))
+=======
+colourCount = length(unique(finals6$region))
+getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
+levels(finals6$zona)[levels(finals6$zona)=="Urbano"] <- "Urban"
+>>>>>>> ea1a1d689169bf76c65dc6da0301695b6a055c62
 
 #overall model
 s6ova <- ggplot(finals6, aes(x=ses,y=log(s6))) +
@@ -1063,15 +1075,18 @@ s6region <- ggplot(finals6, aes(x=ses,y=log(s6),colour=region)) +
   labs(x="Socioeconomic position",y="log(AFR)",colour="Region")+
   guides(colour = guide_legend(title.position = "top"))
 
+<<<<<<< HEAD
 ggarrange(s6ova, s6zona, s6region, labels = c("A", "B", "C"), ncol = 2, nrow = 2)
 
+=======
+>>>>>>> ea1a1d689169bf76c65dc6da0301695b6a055c62
 # #Age at last reproduction --------------------------------------------------------
 
 #overall model
 ggplot(finaleuh,aes(x=ses, y=euh)) +
   geom_point()+
   geom_smooth(method="lm", se=T) +
-  labs(x="SEP",y="ALR")+
+  labs(x="Socioeconomic position",y="ALR")+
   theme_classic()
 
 # #Interbirth interval --------------------------------------------------------
@@ -1087,7 +1102,7 @@ ggplot(finalien,aes(x=ses, y=ien, colour=region)) +
   geom_smooth(method="glm",method.args=list(family=Gamma), se=F) +
   theme_classic()
 
-# Reproductive density --------------------------------------------------------
+# Birth density --------------------------------------------------------
 
 colourCount = length(unique(finalrd$region))
 getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
@@ -1098,7 +1113,7 @@ ggplot(finalrd,aes(ses,log(rd),colour=region))+
   geom_smooth(method="lm", se=F) +
   theme(legend.position = "bottom",legend.key = element_blank(),panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "grey")) +
   scale_colour_manual(values = getPalette(colourCount))+
-  labs(x="Socioeconomic position",y="log(RD)",colour="Region")+
+  labs(x="Socioeconomic position",y="log(BD)",colour="Region")+
   guides(colour = guide_legend(title.position = "top"))
 
 # #former code...useful for recycle ---------------------------------------
