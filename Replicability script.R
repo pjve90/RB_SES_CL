@@ -1005,8 +1005,15 @@ plot(lmerd.3)
 #install ggeffects package
 install.packages("ggeffects")
 library(ggeffects)
+#install RColorBrewer
+install.packages("RColorBrewer")
+library(RColorBrewer)
+#install ggsci
+install.packages("ggsci")
+library(ggsci)
+
 #colorblind palette
-cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+cbp1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73","#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 # #Nº of offspring --------------------------------------------------------
 
@@ -1028,19 +1035,36 @@ ggplot(final,aes(x=ses, y=s5, colour=region)) +
 
 # #Age at first reproduction --------------------------------------------------------
 
-colourCount = length(unique(finals6$region))
-getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
+colourCount = length(unique(finals6$zona))
+getPalette = colorRampPalette(brewer.pal(2, "RdYlBu"))
 
 #overall model
-ggplot(finals6, aes(x=ses,y=log(s6),colour=region)) +
+s6ova <- ggplot(finals6, aes(x=ses,y=log(s6))) +
+  geom_point()+
+  geom_smooth(method="lm", se=T) +
+  labs(x="Socioeconomic position",y="log(AFR)")+
+  theme(legend.position = "bottom",legend.key = element_blank(),panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "grey")) 
+
+s6zona <- ggplot(finals6, aes(x=ses,y=log(s6),colour=zona)) +
   geom_point()+
   geom_smooth(method="lm", se=F) +
-  facet_grid(.~zona, margins=T)+
+  theme(legend.position = "bottom",legend.key = element_blank(),panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "grey")) +
+  scale_colour_jco()+
+  labs(x="Socioeconomic position",y="log(AFR)",colour="Urban/Rural")+
+  guides(colour = guide_legend(title.position = "top"))
+
+colourCount = length(unique(finals6$region))
+getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
+s6region <- ggplot(finals6, aes(x=ses,y=log(s6),colour=region)) +
+  geom_point()+
+  geom_smooth(method="lm", se=F) +
   theme(legend.position = "bottom",legend.key = element_blank(),panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "grey")) +
   scale_colour_manual(values = getPalette(colourCount))+
   labs(x="Socioeconomic position",y="log(AFR)",colour="Region")+
   guides(colour = guide_legend(title.position = "top"))
-  
+
+ggarrange(s6ova, s6zona, s6region, labels = c("A", "B", "C"), ncol = 2, nrow = 2)
+
 # #Age at last reproduction --------------------------------------------------------
 
 #overall model
