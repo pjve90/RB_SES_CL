@@ -858,6 +858,66 @@ AIC(nblmes5.1,nblmes5.2,nblmes5.3,nblmes5.4,nblmes5.5)
 #nblmes5.3 is the best model
 glm.diag.plots(nblmes5.3)
 
+# #NM --------------
+#Let's check nblmes5.3 for assumptions, based in https://stats.stackexchange.com/questions/70558/diagnostic-plots-for-count-regression:
+final$s5
+
+library(MASS)
+library(vcd)
+explore_s5 <- goodfit(final$s5)
+summary(explore_s5)
+rootogram(explore_s5)
+Ord_plot(final$s5)
+
+distplot(final$s5, type = "nbinom")
+distplot(final$s5, type = "poisson")
+
+#So ngebin is much better fit.
+summary(nblmes5.3)
+anova(nblmes5.3, test = "Chisq")
+
+deviance(nblmes5.3) / nblmes5.3$df.residual
+#library(AER)
+#dispersiontest(nblmes5.3)
+influencePlot(nblmes5.3)
+
+#Now for assumptions proper, let's see DHARMA's approach https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
+library(DHARMa)
+simulationOutput <- simulateResiduals(nblmes5.3, n = 250, use.u = T)
+testResiduals(simulationOutput)
+
+
+hist(simulationOutput$scaledResiduals)
+plot(simulationOutput)
+testUniformity(simulationOutput)
+testDispersion(simulationOutput)
+testZeroInflation(simulationOutput)
+
+#Let's try something else
+nblmes5.3.1 <- glm.nb(s5 ~ ses + region + zona + (1 |
+                                                    folio), data = final)
+summary(nblmes5.3.1)
+
+simulationOutput <- simulateResiduals(nblmes5.3.1)
+plot(simulationOutput)
+
+#Still not quite right. I'll follow up by trying two other things I read here:
+#https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
+#install.packages("glmmTMB")
+library(glmmTMB)
+
+nblmes5.3.2 <-
+  glmmTMB(
+    s5 ~ ses + region + zona + (1 |
+                                  folio),
+    ziformula =  ~ (1 | folio) ,
+    data = final,
+    family = nbinom2
+  )
+simulationOutput <- simulateResiduals(nblmes5.3.2)
+plot(simulationOutput)
+
+#Looks even worst. Can I do zero inflated + random-effects with glmer.nb?
 
 
 # #Age at first reproduction ----------------------------------------------
