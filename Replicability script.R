@@ -1,11 +1,11 @@
 #Replicability script
-#Pablo Varas Enr?quez, Luseadra McKerracher, Nicol?s Montalva Rivera 
+#Pablo Varas Enríquez, Luseadra McKerracher, Nicolás Montalva Rivera 
 
 # Workspace management ----------------------------------------------------
 
 #Establishing directory
-getwd()
-setwd("folder_directory")
+#getwd()
+#setwd("folder_directory")
 #Establishing history and image
 savehistory(".~RB_SES_CL.Rhistory")
 save.image(".~RB_SES_CL.RData")
@@ -27,7 +27,7 @@ install.packages("tidyverse")
 library(tidyverse)
 
 #importing CASEN with spss.get()
-casen <- spss.get("C:/Users/Pablo/Documents/Dropbox antiguo/Publicacion/RB_SES_CL/CASEN_2013_MN_B_Principal.sav", use.value.labels=TRUE)
+casen <- spss.get("CASEN_2013_MN_B_Principal.sav", use.value.labels=TRUE)
 #corroboration that is a data frame
 is.data.frame(casen)
 
@@ -858,6 +858,8 @@ AIC(nblmes5.1,nblmes5.2,nblmes5.3,nblmes5.4,nblmes5.5)
 #nblmes5.3 is the best model
 glm.diag.plots(nblmes5.3)
 
+
+
 # #Age at first reproduction ----------------------------------------------
 
 #prepare data
@@ -1011,12 +1013,10 @@ library(RColorBrewer)
 #install ggsci
 install.packages("ggsci")
 library(ggsci)
-<<<<<<< HEAD
-=======
+
 #install ggpubr
 install.packages("ggpubr")
 library(ggpubr)
->>>>>>> ea1a1d689169bf76c65dc6da0301695b6a055c62
 
 #colorblind palette
 cbp1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73","#F0E442", "#0072B2", "#D55E00", "#CC79A7")
@@ -1041,14 +1041,12 @@ ggplot(final,aes(x=ses, y=s5, colour=region)) +
 
 # #Age at first reproduction --------------------------------------------------------
 
-<<<<<<< HEAD
 colourCount = length(unique(finals6$zona))
 getPalette = colorRampPalette(brewer.pal(2, "RdYlBu"))
-=======
+
 colourCount = length(unique(finals6$region))
 getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
 levels(finals6$zona)[levels(finals6$zona)=="Urbano"] <- "Urban"
->>>>>>> ea1a1d689169bf76c65dc6da0301695b6a055c62
 
 #overall model
 s6ova <- ggplot(finals6, aes(x=ses,y=log(s6))) +
@@ -1075,11 +1073,9 @@ s6region <- ggplot(finals6, aes(x=ses,y=log(s6),colour=region)) +
   labs(x="Socioeconomic position",y="log(AFR)",colour="Region")+
   guides(colour = guide_legend(title.position = "top"))
 
-<<<<<<< HEAD
+
 ggarrange(s6ova, s6zona, s6region, labels = c("A", "B", "C"), ncol = 2, nrow = 2)
 
-=======
->>>>>>> ea1a1d689169bf76c65dc6da0301695b6a055c62
 # #Age at last reproduction --------------------------------------------------------
 
 #overall model
