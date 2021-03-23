@@ -20,10 +20,10 @@ memory.size(max = FALSE)
 
 #R package to use
 #"Hmisc" package
-install.packages("Hmisc")
+# #install.packages(|"Hmisc")
 library(Hmisc)
 #"tidyverse" package
-install.packages("tidyverse")
+#install.packages("tidyverse")
 library(tidyverse)
 
 #importing CASEN with spss.get()
@@ -715,7 +715,7 @@ plot(ien~v26, data=test, ylab=c("IBI"), main="IBI ~ v26")
 plot(rd~v26, data=test, ylab=c("RD"), main="RD ~ v26")
 
 #check correlation of variables
-install.packages("psych")
+# #install.packages("psych")
 library(psych)
 #income variables
 #Pearson
@@ -745,7 +745,7 @@ summary(aov(ytotcorh~v2+v6+v9+v12+v24+v25+v26, test))
 
 
 #install FactoMineR
-install.packages("FactoMineR")
+# #install.packages("FactoMineR")
 library(FactoMineR)
 #FAMD with all the SES variables
 summary(test[,c("pco1","ESC","educ","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot","s14","v1","v2","v4","v6","v9","v11","v12","v23","v24","v25","v26")])
@@ -791,17 +791,17 @@ final$ses2 <- ntile(final$ses, 2)
 
 
 #install package lme4
-install.packages("lme4")
+# #install.packages("lme4")
 library(lme4)
 #"fitdistrplus" package
 update.packages("fitdistrplus")
-install.packages("fitdistrplus")
+#install.packages("fitdistrplus")
 library(fitdistrplus)
 #"boot" package
-install.packages("boot")
+#install.packages("boot")
 library(boot)
 #"AER" package
-install.packages("AER")
+#install.packages("AER")
 library(AER)
 
 # #Nº of Offspring --------------------------------------------------------
@@ -903,19 +903,19 @@ plot(simulationOutput)
 
 #Still not quite right. I'll follow up by trying two other things I read here:
 #https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
-#install.packages("glmmTMB")
+##install.packages("glmmTMB")
 library(glmmTMB)
 
-nblmes5.3.2 <-
-  glmmTMB(
-    s5 ~ ses + region + zona + (1 |
-                                  folio),
-    ziformula =  ~ (1 | folio) ,
-    data = final,
-    family = nbinom2
-  )
-simulationOutput <- simulateResiduals(nblmes5.3.2)
-plot(simulationOutput)
+#nblmes5.3.2 <-
+#   glmmTMB(
+#     s5 ~ ses + region + zona + (1 |
+#                                   folio),
+#     ziformula =  ~ (1 | folio) ,
+#     data = final,
+#     family = nbinom2
+#   )
+# simulationOutput <- simulateResiduals(nblmes5.3.2)
+# plot(simulationOutput)
 
 #Looks even worst. Can I do zero inflated + random-effects with glmer.nb?
 
@@ -959,6 +959,7 @@ plot(lmes6.3)
 #prepare data
 sum(is.na(final$euh))
 finaleuh <- final[complete.cases(final$euh),]
+finaleuh$euh <- as.numeric(finaleuh$euh)
 #distribution
 par(mfrow=c(1,1))
 descdist(finaleuh$euh, discrete = F, boot = 500)
@@ -995,6 +996,7 @@ finalien[which(finalien$ien==0),c("ien")] <- NA
 sum(is.na(finalien$ien))
 finalien <- finalien[complete.cases(finalien$ien),]
 sum(is.na(finalien$ien))
+finalien$ien <- as.numeric(finalien$ien)
 #distribution
 par(mfrow=c(1,1))
 descdist(finalien$ien, discrete = F, boot = 500)
@@ -1033,6 +1035,7 @@ finalrd[which(finalrd$rd==0),c("rd")] <- NA
 sum(is.na(finalrd$rd))
 finalrd <- finalrd[complete.cases(finalrd$rd),]
 sum(is.na(finalrd$rd))
+finalrd$rd <- as.numeric(finalrd$rd)
 #distribution
 par(mfrow=c(1,1))
 descdist(log(finalrd$rd), discrete = F, boot = 500)
@@ -1059,23 +1062,25 @@ summary(lmerd.5)
 #AIC
 AIC(lmerd.1,lmerd.2,lmerd.3,lmerd.4,lmerd.5)
 #lmerd.3 are the best model
+par(mfrow=c(2,2))
 plot(lmerd.3)
+par(mfrow=c(1,1))
 
 # #4.- let's do the plots -----------------------------------------------------
 
 
 #install ggeffects package
-install.packages("ggeffects")
+#install.packages("ggeffects")
 library(ggeffects)
 #install RColorBrewer
-install.packages("RColorBrewer")
+#install.packages("RColorBrewer")
 library(RColorBrewer)
 #install ggsci
-install.packages("ggsci")
+#install.packages("ggsci")
 library(ggsci)
 
 #install ggpubr
-install.packages("ggpubr")
+#install.packages("ggpubr")
 library(ggpubr)
 
 #colorblind palette
@@ -1177,7 +1182,7 @@ ggplot(finalrd,aes(ses,log(rd),colour=region))+
 
 # #R packages to use
 # #Package FactoMineR
-# install.packages("FactoMineR")
+# #install.packages("FactoMineR")
 # library(FactoMineR)
 # 
 # #Socioeconomic groups generation
@@ -1298,17 +1303,17 @@ ggplot(finalrd,aes(ses,log(rd),colour=region))+
 # #R packages
 # #"survival" package
 # update.packages("survival")
-# install.packages("survival")
+# #install.packages("survival")
 # library(survival)
 # #"fitdistrplus" package
 # update.packages("fitdistrplus")
-# install.packages("fitdistrplus")
+# #install.packages("fitdistrplus")
 # library(fitdistrplus)
 # #"qcc" package
-# install.packages("qcc")
+# #install.packages("qcc")
 # library(qcc)
 # #"MASS" package
-# install.packages("MASS")
+# #install.packages("MASS")
 # library(MASS)
 # 
 # #Socioeconomic score distribution
