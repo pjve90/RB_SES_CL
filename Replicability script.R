@@ -1,11 +1,11 @@
 #Replicability script
-#Pablo Varas Enr?quez, Luseadra McKerracher, Nicol?s Montalva Rivera 
+#Pablo Varas Enríquez, Luseadra McKerracher, Nicolás Montalva Rivera 
 
 # Workspace management ----------------------------------------------------
 
 #Establishing directory
-getwd()
-setwd("folder_directory")
+#getwd()
+#setwd("folder_directory")
 #Establishing history and image
 savehistory(".~RB_SES_CL.Rhistory")
 save.image(".~RB_SES_CL.RData")
@@ -20,14 +20,28 @@ memory.size(max = FALSE)
 
 #R package to use
 #"Hmisc" package
-install.packages("Hmisc")
+# #install.packages(|"Hmisc")
 library(Hmisc)
 #"tidyverse" package
+<<<<<<< HEAD
 install.packages("dplyr")
 library(dplyr)
+||||||| 5afb383
+install.packages("tidyverse")
+library(tidyverse)
+=======
+#install.packages("tidyverse")
+library(tidyverse)
+>>>>>>> 6e8976386317a2589481fcafc3f8460ba22bde87
 
 #importing CASEN with spss.get()
+<<<<<<< HEAD
 casen <- spss.get("C:/Users/pjvar/Dropbox/RB_SES_CL/CASEN_2013_MN_B_Principal.sav", use.value.labels=TRUE)
+||||||| 5afb383
+casen <- spss.get("C:/Users/Pablo/Documents/Dropbox antiguo/Publicacion/RB_SES_CL/CASEN_2013_MN_B_Principal.sav", use.value.labels=TRUE)
+=======
+casen <- spss.get("CASEN_2013_MN_B_Principal.sav", use.value.labels=TRUE)
+>>>>>>> 6e8976386317a2589481fcafc3f8460ba22bde87
 #corroboration that is a data frame
 is.data.frame(casen)
 
@@ -772,7 +786,7 @@ plot(ien~v26, data=test, ylab=c("IBI"), main="IBI ~ v26")
 plot(rd~v26, data=test, ylab=c("RD"), main="RD ~ v26")
 
 #check correlation of variables
-install.packages("psych")
+# #install.packages("psych")
 library(psych)
 #income variables
 #Pearson
@@ -801,7 +815,7 @@ summary(aov(ytotcorh~v2+v6+v9+v12+v24+v25+v26, test))
 # #FAMD to get socioeconomic scores (is a PCA for mixed data) -------------
 
 #install FactoMineR
-install.packages("FactoMineR")
+# #install.packages("FactoMineR")
 library(FactoMineR)
 #FAMD with all the SES variables
 summary(test[,c("ESC","educ","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot","s14","o29","r19","v1","v2","v4","v6","v9","v11","v12","v23","v24","v25","v26")])
@@ -838,17 +852,17 @@ final$ses2 <- ntile(final$ses, 2)
 
 
 #install package lme4
-install.packages("lme4")
+# #install.packages("lme4")
 library(lme4)
 #"fitdistrplus" package
 update.packages("fitdistrplus")
-install.packages("fitdistrplus")
+#install.packages("fitdistrplus")
 library(fitdistrplus)
 #"boot" package
-install.packages("boot")
+#install.packages("boot")
 library(boot)
 #"AER" package
-install.packages("AER")
+#install.packages("AER")
 library(AER)
 
 # #Nº of Offspring --------------------------------------------------------
@@ -1018,6 +1032,68 @@ summary(lmes5.3.1)
 nblmes5.6.1<- glm.nb(s5~ses+region+(1|folio),data=final)
 summary(nblmes5.6.1)
 
+# #NM --------------
+#Let's check nblmes5.3 for assumptions, based in https://stats.stackexchange.com/questions/70558/diagnostic-plots-for-count-regression:
+final$s5
+
+library(MASS)
+library(vcd)
+explore_s5 <- goodfit(final$s5)
+summary(explore_s5)
+rootogram(explore_s5)
+Ord_plot(final$s5)
+
+distplot(final$s5, type = "nbinom")
+distplot(final$s5, type = "poisson")
+
+#So ngebin is much better fit.
+summary(nblmes5.3)
+anova(nblmes5.3, test = "Chisq")
+
+deviance(nblmes5.3) / nblmes5.3$df.residual
+#library(AER)
+#dispersiontest(nblmes5.3)
+influencePlot(nblmes5.3)
+
+#Now for assumptions proper, let's see DHARMA's approach https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
+library(DHARMa)
+simulationOutput <- simulateResiduals(nblmes5.3, n = 250, use.u = T)
+testResiduals(simulationOutput)
+
+
+hist(simulationOutput$scaledResiduals)
+plot(simulationOutput)
+testUniformity(simulationOutput)
+testDispersion(simulationOutput)
+testZeroInflation(simulationOutput)
+
+#Let's try something else
+nblmes5.3.1 <- glm.nb(s5 ~ ses + region + zona + (1 |
+                                                    folio), data = final)
+summary(nblmes5.3.1)
+
+simulationOutput <- simulateResiduals(nblmes5.3.1)
+plot(simulationOutput)
+
+#Still not quite right. I'll follow up by trying two other things I read here:
+#https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
+##install.packages("glmmTMB")
+library(glmmTMB)
+
+#nblmes5.3.2 <-
+#   glmmTMB(
+#     s5 ~ ses + region + zona + (1 |
+#                                   folio),
+#     ziformula =  ~ (1 | folio) ,
+#     data = final,
+#     family = nbinom2
+#   )
+# simulationOutput <- simulateResiduals(nblmes5.3.2)
+# plot(simulationOutput)
+
+#Looks even worst. Can I do zero inflated + random-effects with glmer.nb?
+
+
 # #Age at first reproduction ----------------------------------------------
 
 #prepare data
@@ -1057,6 +1133,7 @@ plot(lmes6.3)
 #prepare data
 sum(is.na(final$euh))
 finaleuh <- final[complete.cases(final$euh),]
+finaleuh$euh <- as.numeric(finaleuh$euh)
 #distribution
 par(mfrow=c(1,1))
 descdist(finaleuh$euh, discrete = F, boot = 500)
@@ -1096,6 +1173,7 @@ finalien[which(finalien$ien==0),c("ien")] <- NA
 sum(is.na(finalien$ien))
 finalien <- finalien[complete.cases(finalien$ien),]
 sum(is.na(finalien$ien))
+finalien$ien <- as.numeric(finalien$ien)
 #distribution
 par(mfrow=c(1,1))
 descdist(finalien$ien, discrete = F, boot = 500)
@@ -1134,6 +1212,7 @@ finalrd[which(finalrd$rd==0),c("rd")] <- NA
 sum(is.na(finalrd$rd))
 finalrd <- finalrd[complete.cases(finalrd$rd),]
 sum(is.na(finalrd$rd))
+finalrd$rd <- as.numeric(finalrd$rd)
 #distribution
 par(mfrow=c(1,1))
 descdist(log(finalrd$rd), discrete = F, boot = 500)
@@ -1162,26 +1241,39 @@ AIC(lmerd.1,lmerd.2,lmerd.3,lmerd.4,lmerd.5)
 #lmerd.3 are the best model
 par(mfrow=c(2,2))
 plot(lmerd.3)
+par(mfrow=c(1,1))
 
 # #4.- let's do the plots -----------------------------------------------------
 
 
 #install ggeffects package
-install.packages("ggeffects")
+#install.packages("ggeffects")
 library(ggeffects)
 #install RColorBrewer
-install.packages("RColorBrewer")
+#install.packages("RColorBrewer")
 library(RColorBrewer)
 #install ggsci
-install.packages("ggsci")
+#install.packages("ggsci")
 library(ggsci)
+<<<<<<< HEAD
+||||||| 5afb383
+<<<<<<< HEAD
+=======
+=======
+
+>>>>>>> 6e8976386317a2589481fcafc3f8460ba22bde87
 #install ggpubr
-install.packages("ggpubr")
+#install.packages("ggpubr")
 library(ggpubr)
+<<<<<<< HEAD
 #install ggiraphExtra
 install.packages("ggiraphExtra")
 library(ggiraphExtra)
 #>>>>>>> ea1a1d689169bf76c65dc6da0301695b6a055c62
+||||||| 5afb383
+>>>>>>> ea1a1d689169bf76c65dc6da0301695b6a055c62
+=======
+>>>>>>> 6e8976386317a2589481fcafc3f8460ba22bde87
 
 #colorblind palette
 cbp1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73","#F0E442", "#0072B2", "#D55E00", "#CC79A7")
@@ -1205,7 +1297,25 @@ ggplot(plots5, aes(x = sqrt(ses), y = phat, colour = region)) +
 
 # #Age at first reproduction --------------------------------------------------------
 
+<<<<<<< HEAD
 #prepare data
+||||||| 5afb383
+<<<<<<< HEAD
+colourCount = length(unique(finals6$zona))
+getPalette = colorRampPalette(brewer.pal(2, "RdYlBu"))
+=======
+colourCount = length(unique(finals6$region))
+getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
+levels(finals6$zona)[levels(finals6$zona)=="Urbano"] <- "Urban"
+>>>>>>> ea1a1d689169bf76c65dc6da0301695b6a055c62
+=======
+colourCount = length(unique(finals6$zona))
+getPalette = colorRampPalette(brewer.pal(2, "RdYlBu"))
+
+colourCount = length(unique(finals6$region))
+getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
+levels(finals6$zona)[levels(finals6$zona)=="Urbano"] <- "Urban"
+>>>>>>> 6e8976386317a2589481fcafc3f8460ba22bde87
 
 plots6 <- finals6[,c("ses","s6","region")]
 plots6$phat <- predict(lmes6.3,type="response")
@@ -1213,11 +1323,19 @@ plots6 <- plots6[with(plots6,order(region)),]
 
 #plot it
 
+<<<<<<< HEAD
 ggplot(plots6, aes(x = ses, y = exp(phat), colour = region)) +
   geom_point(aes(y = s6), alpha=.5, position=position_jitter(h=.2)) +
   geom_line(size = 1) +
   labs(x = "SEP", y = "AFR") +
   theme_classic()
+||||||| 5afb383
+<<<<<<< HEAD
+ggarrange(s6ova, s6zona, s6region, labels = c("A", "B", "C"), ncol = 2, nrow = 2)
+=======
+
+ggarrange(s6ova, s6zona, s6region, labels = c("A", "B", "C"), ncol = 2, nrow = 2)
+>>>>>>> 6e8976386317a2589481fcafc3f8460ba22bde87
 
 # #Age at last reproduction --------------------------------------------------------
 
@@ -1271,7 +1389,7 @@ ggplot(plotrd, aes(x = ses, y = exp(phat), colour = region)) +
 
 # #R packages to use
 # #Package FactoMineR
-# install.packages("FactoMineR")
+# #install.packages("FactoMineR")
 # library(FactoMineR)
 # 
 # #Socioeconomic groups generation
@@ -1392,17 +1510,17 @@ ggplot(plotrd, aes(x = ses, y = exp(phat), colour = region)) +
 # #R packages
 # #"survival" package
 # update.packages("survival")
-# install.packages("survival")
+# #install.packages("survival")
 # library(survival)
 # #"fitdistrplus" package
 # update.packages("fitdistrplus")
-# install.packages("fitdistrplus")
+# #install.packages("fitdistrplus")
 # library(fitdistrplus)
 # #"qcc" package
-# install.packages("qcc")
+# #install.packages("qcc")
 # library(qcc)
 # #"MASS" package
-# install.packages("MASS")
+# #install.packages("MASS")
 # library(MASS)
 # 
 # #Socioeconomic score distribution
