@@ -23,25 +23,12 @@ memory.size(max = FALSE)
 # #install.packages(|"Hmisc")
 library(Hmisc)
 #"tidyverse" package
-<<<<<<< HEAD
-install.packages("dplyr")
 library(dplyr)
-||||||| 5afb383
-install.packages("tidyverse")
-library(tidyverse)
-=======
 #install.packages("tidyverse")
 library(tidyverse)
->>>>>>> 6e8976386317a2589481fcafc3f8460ba22bde87
 
 #importing CASEN with spss.get()
-<<<<<<< HEAD
-casen <- spss.get("C:/Users/pjvar/Dropbox/RB_SES_CL/CASEN_2013_MN_B_Principal.sav", use.value.labels=TRUE)
-||||||| 5afb383
-casen <- spss.get("C:/Users/Pablo/Documents/Dropbox antiguo/Publicacion/RB_SES_CL/CASEN_2013_MN_B_Principal.sav", use.value.labels=TRUE)
-=======
 casen <- spss.get("CASEN_2013_MN_B_Principal.sav", use.value.labels=TRUE)
->>>>>>> 6e8976386317a2589481fcafc3f8460ba22bde87
 #corroboration that is a data frame
 is.data.frame(casen)
 
@@ -855,7 +842,7 @@ final$ses2 <- ntile(final$ses, 2)
 # #install.packages("lme4")
 library(lme4)
 #"fitdistrplus" package
-update.packages("fitdistrplus")
+#update.packages("fitdistrplus")
 #install.packages("fitdistrplus")
 library(fitdistrplus)
 #"boot" package
@@ -1255,25 +1242,14 @@ library(RColorBrewer)
 #install ggsci
 #install.packages("ggsci")
 library(ggsci)
-<<<<<<< HEAD
-||||||| 5afb383
-<<<<<<< HEAD
-=======
-=======
-
->>>>>>> 6e8976386317a2589481fcafc3f8460ba22bde87
 #install ggpubr
 #install.packages("ggpubr")
 library(ggpubr)
-<<<<<<< HEAD
 #install ggiraphExtra
-install.packages("ggiraphExtra")
+#install.packages("ggiraphExtra")
 library(ggiraphExtra)
-#>>>>>>> ea1a1d689169bf76c65dc6da0301695b6a055c62
-||||||| 5afb383
->>>>>>> ea1a1d689169bf76c65dc6da0301695b6a055c62
-=======
->>>>>>> 6e8976386317a2589481fcafc3f8460ba22bde87
+install.packages("ggthemes")
+library(ggthemes)
 
 #colorblind palette
 cbp1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73","#F0E442", "#0072B2", "#D55E00", "#CC79A7")
@@ -1288,34 +1264,19 @@ plots5 <- plots5[with(plots5,order(region)),]
 
 #plot it
 
-ggplot(plots5, aes(x = sqrt(ses), y = phat, colour = region)) +
+ggplot(plots5, aes(x = sqrt(ses), y = phat, colour = region, shape = region)) +
   geom_point(aes(y = s5), alpha=.5, position=position_jitter(h=.2)) +
-  geom_line(size = 1) +
+  geom_line(size = 1, aes(linetype=region)) +
   labs(x = "sqrt(SEP)", y = "N° of Offspring") +
+  scale_shape_manual(values=c(17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,16)) +
+  scale_linetype_manual(values=c(1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2)) +
+  scale_colour_manual(values=c("#000000","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7")) +
   theme_classic()
 
 
 # #Age at first reproduction --------------------------------------------------------
 
-<<<<<<< HEAD
 #prepare data
-||||||| 5afb383
-<<<<<<< HEAD
-colourCount = length(unique(finals6$zona))
-getPalette = colorRampPalette(brewer.pal(2, "RdYlBu"))
-=======
-colourCount = length(unique(finals6$region))
-getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
-levels(finals6$zona)[levels(finals6$zona)=="Urbano"] <- "Urban"
->>>>>>> ea1a1d689169bf76c65dc6da0301695b6a055c62
-=======
-colourCount = length(unique(finals6$zona))
-getPalette = colorRampPalette(brewer.pal(2, "RdYlBu"))
-
-colourCount = length(unique(finals6$region))
-getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
-levels(finals6$zona)[levels(finals6$zona)=="Urbano"] <- "Urban"
->>>>>>> 6e8976386317a2589481fcafc3f8460ba22bde87
 
 plots6 <- finals6[,c("ses","s6","region")]
 plots6$phat <- predict(lmes6.3,type="response")
@@ -1323,19 +1284,11 @@ plots6 <- plots6[with(plots6,order(region)),]
 
 #plot it
 
-<<<<<<< HEAD
 ggplot(plots6, aes(x = ses, y = exp(phat), colour = region)) +
   geom_point(aes(y = s6), alpha=.5, position=position_jitter(h=.2)) +
   geom_line(size = 1) +
   labs(x = "SEP", y = "AFR") +
   theme_classic()
-||||||| 5afb383
-<<<<<<< HEAD
-ggarrange(s6ova, s6zona, s6region, labels = c("A", "B", "C"), ncol = 2, nrow = 2)
-=======
-
-ggarrange(s6ova, s6zona, s6region, labels = c("A", "B", "C"), ncol = 2, nrow = 2)
->>>>>>> 6e8976386317a2589481fcafc3f8460ba22bde87
 
 # #Age at last reproduction --------------------------------------------------------
 
