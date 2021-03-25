@@ -932,7 +932,7 @@ dispersiontest(lmes5.3,trafo=1)
 #check influence points
 influencePlot(lmes5.3)
 #compare to zero inflated model
-install.packages("pscl")
+#install.packages("pscl")
 library(pscl)
 lmes5.zinf <- zeroinfl(s5~ses+region,data=final, dist="poisson")
 AIC(lmes5.3, lmes5.zinf)
@@ -966,7 +966,7 @@ dispersiontest(nblmes5.6,trafo=1)
 #check influence points
 influencePlot(nblmes5.6)
 #compare to zero inflated model
-install.packages("pscl")
+#install.packages("pscl")
 library(pscl)
 nblmes3.zinf <- zeroinfl(s5~sqrt(ses)+region,data=final, dist="negbin")
 AIC(nblmes5.3, nblmes3.zinf)
@@ -986,7 +986,7 @@ points(pris$upr  ~ final$ses, col="grey", pch=19)
 
 #Use DHARMa
 #Poisson model
-install.packages("DHARMa")
+#install.packages("DHARMa")
 library(DHARMa)
 simulationOutput <- simulateResiduals(nblmes5.3, n = 250, use.u = T)
 testResiduals(simulationOutput)
@@ -998,7 +998,7 @@ testUniformity(simulationOutput)
 testDispersion(simulationOutput)
 testZeroInflation(simulationOutput)
 #Negative binomial model
-install.packages("DHARMa")
+#install.packages("DHARMa")
 library(DHARMa)
 simulationOutput2 <- simulateResiduals(nblmes5.6, n = 250, use.u = T)
 testResiduals(simulationOutput2)
@@ -1248,7 +1248,7 @@ library(ggpubr)
 #install ggiraphExtra
 #install.packages("ggiraphExtra")
 library(ggiraphExtra)
-install.packages("ggthemes")
+#install.packages("ggthemes")
 library(ggthemes)
 
 #colorblind palette
@@ -1267,7 +1267,7 @@ plots5 <- plots5[with(plots5,order(region)),]
 ggplot(plots5, aes(x = sqrt(ses), y = phat, colour = region, shape = region)) +
   geom_point(aes(y = s5), alpha=.5, position=position_jitter(h=.2)) +
   geom_line(size = 1, aes(linetype=region)) +
-  labs(x = "sqrt(SEP)", y = "N° of Offspring") +
+  labs(x = expression(sqrt(SEP)), y = "N° of Offspring") +
   scale_shape_manual(values=c(17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,16)) +
   scale_linetype_manual(values=c(1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2)) +
   scale_colour_manual(values=c("#000000","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7")) +
@@ -1284,10 +1284,13 @@ plots6 <- plots6[with(plots6,order(region)),]
 
 #plot it
 
-ggplot(plots6, aes(x = ses, y = exp(phat), colour = region)) +
+ggplot(plots6, aes(x = ses, y = exp(phat), colour = region, shape = region)) +
   geom_point(aes(y = s6), alpha=.5, position=position_jitter(h=.2)) +
-  geom_line(size = 1) +
+  geom_line(size = 1, aes(linetype=region)) +
   labs(x = "SEP", y = "AFR") +
+  scale_shape_manual(values=c(17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,16)) +
+  scale_linetype_manual(values=c(1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2)) +
+  scale_colour_manual(values=c("#000000","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7")) +
   theme_classic()
 
 # #Age at last reproduction --------------------------------------------------------
@@ -1304,19 +1307,36 @@ ggplot(ploteuh, aes(x = ses, y = phat, colour = zona)) +
   geom_point(aes(y = euh), alpha=.5, position=position_jitter(h=.2)) +
   geom_line(size = 1) +
   labs(x = "SEP", y = "ALR") +
+  scale_colour_manual(values=c("#E69F00","#009E73")) +
   theme_classic()
 
 # #Interbirth interval --------------------------------------------------------
 
-#overall model
-ggplot(finalien,aes(x=ses, y=ien)) +
-  geom_point()+
-  geom_smooth(method="glm",method.args=list(family=Gamma), se=T) +
+#prepare data
+
+plotien <- finalien[,c("ses","ien","zona","region","comuna","r6")]
+plotien$phat <- predict(lmeien.4,type="response")
+plotien <- plotien[with(plotien,order(zona,region,comuna,r6)),]
+
+#plot it
+
+ggplot(plotien, aes(x = ses, y = phat, colour = region,shape=comuna)) +
+  geom_point(aes(y = ien), alpha=.5, position=position_jitter(h=.2),show.legend = F) +
+  geom_line(size = 1, aes(linetype=region),show.legend = F) +
+  labs(x = "SEP", y = "IBI") +
+  scale_shape_manual(values=sample(1:6,311,replace=T)) +
+  scale_linetype_manual(values=c(1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2)) +
+  scale_colour_manual(values=c("#000000","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7")) +
+  facet_grid(r6~zona)+
   theme_classic()
-#region
-ggplot(finalien,aes(x=ses, y=ien, colour=region)) +
-  geom_point()+
-  geom_smooth(method="glm",method.args=list(family=Gamma), se=F) +
+
+ggplot(plotien, aes(x = ses, y = phat, colour = region,shape=region)) +
+  geom_point(aes(y = ien), alpha=.5, position=position_jitter(h=.2),show.legend = F) +
+  geom_line(size = 1, aes(linetype=region),show.legend = F) +
+  labs(x = "SEP", y = "IBI") +
+  scale_shape_manual(values=sample(1:6,15,replace=T)) +
+  scale_linetype_manual(values=c(1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2)) +
+  scale_colour_manual(values=c("#000000","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7")) +
   theme_classic()
 
 # Birth density --------------------------------------------------------
@@ -1329,12 +1349,14 @@ plotrd <- plotrd[with(plotrd,order(zona,region)),]
 
 #plot it
 
-ggplot(plotrd, aes(x = ses, y = exp(phat), colour = region)) +
+ggplot(plotrd, aes(x = ses, y = exp(phat), colour = region, shape = region)) +
   geom_point(aes(y = rd), alpha=.5, position=position_jitter(h=.2)) +
-  geom_line(size = 1) +
-  scale_color_grey() +
-  labs(x = "SEP", y = "Reproductive Density") +
-  facet_grid(. ~ zona) +
+  geom_line(size = 1, aes(linetype=region)) +
+  labs(x = "SEP", y = "AFR") +
+  scale_shape_manual(values=c(17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,16)) +
+  scale_linetype_manual(values=c(1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2)) +
+  scale_colour_manual(values=c("#000000","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7")) +
+  facet_grid(.~zona)+
   theme_classic()
 
 # #former code...useful for recycle ---------------------------------------
