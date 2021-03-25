@@ -23,11 +23,11 @@ memory.size(max = FALSE)
 install.packages("Hmisc")
 library(Hmisc)
 #"tidyverse" package
-install.packages("tidyverse")
-library(tidyverse)
+install.packages("dplyr")
+library(dplyr)
 
 #importing CASEN with spss.get()
-casen <- spss.get("C:/Users/Pablo/Documents/Dropbox antiguo/Publicacion/RB_SES_CL/CASEN_2013_MN_B_Principal.sav", use.value.labels=TRUE)
+casen <- spss.get("C:/Users/pjvar/Dropbox/RB_SES_CL/CASEN_2013_MN_B_Principal.sav", use.value.labels=TRUE)
 #corroboration that is a data frame
 is.data.frame(casen)
 
@@ -221,6 +221,8 @@ summary(fcohort$rd)
 
 
 test <- fcohort
+
+# #Geographic and ID variables -----
 #region
 is.factor(test$region)
 sum(is.na(test$region))
@@ -289,6 +291,8 @@ plot(s6~pco1, data=test, ylab=c("AFR"), main="AFR ~ pco1")
 plot(euh~pco1, data=test, ylab=c("ALR"), main="ALR ~ pco1")
 plot(ien~pco1, data=test, ylab=c("IBI"), main="IBI ~ pco1")
 plot(rd~pco1, data=test, ylab=c("RD"), main="RD ~ pco1")
+
+## Education ------
 #years of schooling
 is.numeric(test$ESC)
 sum(is.na(test$ESC))
@@ -328,6 +332,8 @@ plot(s6~educ, data=test, ylab=c("AFR"), main="AFR ~ educ")
 plot(euh~educ, data=test, ylab=c("ALR"), main="ALR ~ educ")
 plot(ien~educ, data=test, ylab=c("IBI"), main="IBI ~ educ")
 plot(rd~educ, data=test, ylab=c("RD"), main="RD ~ educ")
+
+## Income ----
 #household salary
 is.numeric(test$ytrabajoCorh)
 sum(is.na(test$ytrabajoCorh))
@@ -418,6 +424,9 @@ plot(s6~log(ypchtot), data=test, ylab=c("AFR"), main="AFR ~ ypchtot")
 plot(euh~log(ypchtot), data=test, ylab=c("ALR"), main="ALR ~ ypchtot")
 plot(ien~log(ypchtot), data=test, ylab=c("IBI"), main="IBI ~ ypchtot")
 plot(rd~log(ypchtot), data=test, ylab=c("RD"), main="RD ~ ypchtot")
+
+## Healthcare and pension ----
+
 #healthcare system
 is.factor(test$s14)
 sum(is.na(test$s14))
@@ -440,6 +449,30 @@ plot(s6~s14, data=test, ylab=c("AFR"), main="AFR ~ s14")
 plot(euh~s14, data=test, ylab=c("ALR"), main="ALR ~ s14")
 plot(ien~s14, data=test, ylab=c("IBI"), main="IBI ~ s14")
 plot(rd~s14, data=test, ylab=c("RD"), main="RD ~ s14")
+#pension system
+is.factor(test$o29)
+sum(is.na(test$o29))
+levels(test$o29)
+summary(test$o29)
+test$o29[which(test$o29 == "No sabe")] <- NA
+summary(test$o29)
+test <- test[complete.cases(test[,c("o29")]),]
+sum(is.na(test$o29))
+test$o29 <- droplevels(test$o29)
+summary(test$o29)
+summary(aov(s5~o29, data=test))
+summary(aov(s6~o29, data=test))
+summary(aov(euh~o29, data=test))
+summary(aov(ien~o29, data=test))
+summary(aov(rd~o29, data=test))
+layout(mat = matrix(c(1,1,2,2,3,3,0,4,4,5,5,0), nrow = 2, byrow = TRUE))
+plot(s5~o29, data=test, ylab=c("Nº Offs."), main="Nº Offs. ~ o29")
+plot(s6~o29, data=test, ylab=c("AFR"), main="AFR ~ o29")
+plot(euh~o29, data=test, ylab=c("ALR"), main="ALR ~ o29")
+plot(ien~o29, data=test, ylab=c("IBI"), main="IBI ~ o29")
+plot(rd~o29, data=test, ylab=c("RD"), main="RD ~ o29")
+
+## Ethnic identity ----
 #ethnic group
 is.factor(test$r6)
 sum(is.na(test$r6))
@@ -491,6 +524,30 @@ plot(s6~ethnic, data=test, ylab=c("AFR"), main="AFR ~ ethnic")
 plot(euh~ethnic, data=test, ylab=c("ALR"), main="ALR ~ ethnic")
 plot(ien~ethnic, data=test, ylab=c("IBI"), main="IBI ~ ethnic")
 plot(rd~ethnic, data=test, ylab=c("RD"), main="RD ~ ethnic")
+
+##Living conditions and property ownership ----
+#mobile phone
+is.factor(test$r19)
+sum(is.na(test$r19))
+levels(test$r19)
+summary(test$r19)
+test$r19[which(test$r19 == "NS/NR")] <- NA
+summary(test$r19)
+test <- test[complete.cases(test[,c("r19")]),]
+sum(is.na(test$r19))
+test$r19 <- droplevels(test$r19)
+summary(test$r19)
+summary(aov(s5~r19, data=test))
+summary(aov(s6~r19, data=test))
+summary(aov(euh~r19, data=test))
+summary(aov(ien~r19, data=test))
+summary(aov(rd~r19, data=test))
+layout(mat = matrix(c(1,1,2,2,3,3,0,4,4,5,5,0), nrow = 2, byrow = TRUE))
+plot(s5~r19, data=test, ylab=c("Nº Offs."), main="Nº Offs. ~ r19")
+plot(s6~r19, data=test, ylab=c("AFR"), main="AFR ~ r19")
+plot(euh~r19, data=test, ylab=c("ALR"), main="ALR ~ r19")
+plot(ien~r19, data=test, ylab=c("IBI"), main="IBI ~ r19")
+plot(rd~r19, data=test, ylab=c("RD"), main="RD ~ r19")
 #type of house
 is.factor(test$v1)
 sum(is.na(test$v1))
@@ -743,30 +800,20 @@ summary(aov(ytotcorh~v2+v6+v9+v12+v24+v25+v26, test))
 
 # #FAMD to get socioeconomic scores (is a PCA for mixed data) -------------
 
-
 #install FactoMineR
 install.packages("FactoMineR")
 library(FactoMineR)
 #FAMD with all the SES variables
-summary(test[,c("pco1","ESC","educ","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot","s14","v1","v2","v4","v6","v9","v11","v12","v23","v24","v25","v26")])
-famd1 <- FAMD(test[,c("pco1","ESC","educ","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot","s14","v1","v2","v4","v6","v9","v11","v12","v23","v24","v25","v26")])
+summary(test[,c("ESC","educ","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot","s14","o29","r19","v1","v2","v4","v6","v9","v11","v12","v23","v24","v25","v26")])
+famd1 <- FAMD(test[,c("ESC","educ","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot","s14","o29","r19","v1","v2","v4","v6","v9","v11","v12","v23","v24","v25","v26")])
 summary(famd1)
-summary(famd1$var$contrib[,1])
-which(famd1$var$contrib[,1] >= mean(famd1$var$contrib[,1]))
-#FAMD with all the SES variables that contributed equal of higher to the mean
-summary(test[,c("ESC","educ","ytrabajoCorh","yautcorh","ytotcorh","ypchtot","s14","v9","v12")])
-famd2 <- FAMD(test[,c("ESC","educ","ytrabajoCorh","yautcorh","ytotcorh","ypchtot","s14","v9","v12")])
-summary(famd2)
-summary(famd2$var$contrib[,1])
-#check for outliers
-hist(famd2$ind$coord[,1])
-which(famd2$ind$coord[,1]>=15)
-test[which(famd2$ind$coord[,1]>=15),c("folio","edad", "s5", "s6", "euh", "ien","rd","region","comuna","zona","r6","ESC","educ","ytrabajoCorh","yautcorh","ytotcorh","ypchtot","s14","v9","v12")]
-#get rid of outlier
+hist(famd1$ind$coord[,1])
+which(famd1$ind$coord[,1] > 17)
 #FAMD without outliers
-famdsub <-famd2$ind$coord[which(famd2$ind$coord[,1]<=20),1]
-hist(famdsub)
-
+famd2 <-FAMD(test[which(famd1$ind$coord[,1] < 17),c("ESC","educ","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot","s14","o29","r19","v1","v2","v4","v6","v9","v11","v12","v23","v24","v25","v26")])
+summary(famd2)
+hist(famd2$ind$coord[,1])
+famdsub <- famd2$ind$coord[,1]
 
 # #Standarization, socioeconomic score and deciles ------------------------
 
@@ -775,7 +822,7 @@ q <- scale(famdsub, center = T, scale = T)
 par(mfrow=c(1,1))
 hist(q)
 range01 <- function(x){(x-min(x))/(max(x)-min(x))}
-final <- test[which(famd2$ind$coord[,1]<=20),c("folio","edad", "s5", "s6", "euh", "ien","rd","region","comuna","zona","r6","ethnic", "ESC","educ","ytrabajoCorh","yautcorh","ytotcorh","ypchtot","s14","v9","v12")]
+final <- test[ which(famd1$ind$coord[,1] < 17),c("folio","edad", "s5", "s6", "euh", "ien","rd","region","comuna","zona","r6","ethnic","ESC","educ","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot","s14","o29","r19","v1","v2","v4","v6","v9","v11","v12","v23","v24","v25","v26")]
 final$ses <- range01(q)
 final$ses <- as.vector(final$ses)
 hist(final$ses, breaks = 100)
@@ -806,57 +853,170 @@ library(AER)
 
 # #Nº of Offspring --------------------------------------------------------
 
-
 #distribution
-par(mfrow=c(1,1))
-descdist(final$s5, discrete = T, boot = 500)
-fits5 <- fitdist(final$s5, "pois")
-summary(fits5)
-plot(fits5)
+#par(mfrow=c(1,1))
+#descdist(final$s5, discrete = T, boot = 500)
+#fits5 <- fitdist(final$s5, "pois")
+#summary(fits5)
+#plot(fits5)
 #run a generalized mixed-effect model
 #Poisson regression only with ses
-lmes5.1 <- glm(s5~ses,data=final, family = poisson(link = "log"))
+lmes5.1 <- glm(s5~sqrt(ses),data=final, family = poisson(link = "log"))
 summary(lmes5.1)
 #Poisson regression with multiple variables
-lmes5.2 <- glm(s5~ses+region+zona+ethnic,data=final, family = poisson(link = "log"))
+lmes5.2 <- glm(s5~sqrt(ses)+region+comuna+zona+r6,data=final, family = poisson(link = "log"))
 summary(lmes5.2)
 #Poisson regression with multiple variables after step AIC
 step(lmes5.2, direction="both")
-lmes5.3 <- glm(s5~ses+region+zona,data=final, family = poisson(link = "log"))
+lmes5.3 <- glm(s5~sqrt(ses)+region,data=final, family = poisson(link = "log"))
 summary(lmes5.3)
 #generalized Poisson mixed-effect model
-lmes5.4 <- glmer(s5~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic),data=final, family = poisson(link = "log"))
+lmes5.4 <- glmer(s5~sqrt(ses)+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6),data=final, family = poisson(link = "log"))
 summary(lmes5.4)
 #generalized Poisson mixed-effect model with step AIC
-lmes5.5 <- glmer(s5~ses+(1+ses|region)+(1+ses|zona),data=final, family = poisson(link = "log"))
+lmes5.5 <- glmer(s5~sqrt(ses)+(1+ses|region),data=final, family = poisson(link = "log"))
 summary(lmes5.5)
+
 #AIC
 AIC(lmes5.1,lmes5.2,lmes5.3,lmes5.4, lmes5.5)
 #lmes5.3 is the best model
 glm.diag.plots(lmes5.3)
-dispersiontest(lmes5.3)
-#overdispersed!
+dispersiontest(lmes5.3,trafo=1)
+#not overdispersed
+
 #Negative binomial regression models
 #Poisson regression only with ses
-nblmes5.1 <- glm.nb(s5~ses,data=final)
+nblmes5.1 <- glm.nb(s5~ses,data=final,link=log)
 summary(nblmes5.1)
 #Poisson regression with multiple variables
-nblmes5.2 <- glm.nb(s5~ses+region+zona+ethnic,data=final)
+nblmes5.2 <- glm.nb(s5~ses+region+comuna+zona+r6,data=final,link=log)
 summary(nblmes5.2)
 #Poisson regression with multiple variables after step AIC
 step(nblmes5.2, direction="both")
-nblmes5.3 <- glm.nb(s5~ses+region+zona,data=final)
+nblmes5.3 <- glm.nb(s5~ses+comuna+zona+r6,data=final,link=log)
 summary(nblmes5.3)
 #generalized Poisson mixed-effect model
-nblmes5.4 <- glmer.nb(s5~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic),data=final)
+nblmes5.4 <- glmer.nb(s5~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6),data=final)
 summary(nblmes5.4)
 #generalized Poisson mixed-effect model with step AIC
-nblmes5.5 <- glmer.nb(s5~ses+(1+ses|region)+(1+ses|zona),data=final)
+nblmes5.5 <- glmer.nb(s5~ses+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6),data=final)
 summary(nblmes5.5)
+#Poisson regression with multiple variables
+nblmes5.6 <- glm.nb(s5~ses+region,data=final,link=log)
+summary(nblmes5.6)
+#Poisson regression with multiple variables
+nblmes5.7 <- glmer.nb(s5~ses+(1+ses|region),data=final)
+summary(nblmes5.7)
 #AIC
-AIC(nblmes5.1,nblmes5.2,nblmes5.3,nblmes5.4,nblmes5.5)
-#nblmes5.3 is the best model
+AIC(nblmes5.1,nblmes5.2,nblmes5.3,nblmes5.4,nblmes5.5,lmes5.3)
+#nblmes5.6 and lmes5.3 are the best models
 glm.diag.plots(nblmes5.3)
+glm.diag.plots(lmes5.3)
+
+#check models
+#Poisson model lmes5.3
+#test and graph the original count data
+library(MASS)
+library(vcd)
+fit_s5 <- goodfit(final$s5,type="poisson") 
+summary(fit_s5) 
+rootogram(fit_s5)
+Ord_plot(final$s5)
+distplot(final$s5, type="poisson")
+#good-of-fitness measure
+anova(lmes5.3,test = "Chisq")
+#check under/overdispersion
+deviance(lmes5.3)/lmes5.3$df.residual
+dispersiontest(lmes5.3,trafo=1)
+#check influence points
+influencePlot(lmes5.3)
+#compare to zero inflated model
+install.packages("pscl")
+library(pscl)
+lmes5.zinf <- zeroinfl(s5~ses+region,data=final, dist="poisson")
+AIC(lmes5.3, lmes5.zinf)
+#plot residuals
+res <- residuals(lmes5.3, type="deviance")
+plot(log(predict(lmes5.3)), res)
+abline(h=0, lty=2)
+qqnorm(res)
+qqline(res)
+#diagnostic plots
+plot(s5~ses, data=final) 
+prs  <- predict(lmes5.3, type="response", se.fit=TRUE)
+pris <- data.frame("pest"=prs[[1]], "lwr"=prs[[1]]-prs[[2]], "upr"=prs[[1]]+prs[[2]])
+points(pris$pest ~ final$ses, col="red")
+points(pris$lwr  ~ final$ses, col="pink", pch=19)
+points(pris$upr  ~ final$ses, col="pink", pch=19)
+#Negative binomial model nblmes5.6
+#test and graph the original count data
+library(MASS)
+library(vcd)
+fit_s52 <- goodfit(final$s5,type="nbinom") 
+summary(fit_s52) 
+rootogram(fit_s52)
+Ord_plot(final$s5)
+distplot(final$s5, type="nbinom")
+#good-of-fitness measure
+anova(nblmes5.6,test = "Chisq")
+#check under/overdispersion
+deviance(nblmes5.6)/nblmes5.6$df.residual
+dispersiontest(nblmes5.6,trafo=1)
+#check influence points
+influencePlot(nblmes5.6)
+#compare to zero inflated model
+install.packages("pscl")
+library(pscl)
+nblmes3.zinf <- zeroinfl(s5~sqrt(ses)+region,data=final, dist="negbin")
+AIC(nblmes5.3, nblmes3.zinf)
+#plot residuals
+res <- residuals(lmes5.3, type="deviance")
+plot(log(predict(lmes5.3)), res)
+abline(h=0, lty=2)
+qqnorm(res)
+qqline(res)
+#diagnostic plots
+plot(s5~ses, data=final) 
+prs  <- predict(nblmes5.6, type="response", se.fit=TRUE)
+pris <- data.frame("pest"=prs[[1]], "lwr"=prs[[1]]-prs[[2]], "upr"=prs[[1]]+prs[[2]])
+points(pris$pest ~ final$ses, col="red")
+points(pris$lwr  ~ final$ses, col="grey", pch=19)
+points(pris$upr  ~ final$ses, col="grey", pch=19)
+
+#Use DHARMa
+#Poisson model
+install.packages("DHARMa")
+library(DHARMa)
+simulationOutput <- simulateResiduals(nblmes5.3, n = 250, use.u = T)
+testResiduals(simulationOutput)
+
+plotResiduals(simulationOutput)
+hist(simulationOutput$scaledResiduals)
+plot(simulationOutput)
+testUniformity(simulationOutput)
+testDispersion(simulationOutput)
+testZeroInflation(simulationOutput)
+#Negative binomial model
+install.packages("DHARMa")
+library(DHARMa)
+simulationOutput2 <- simulateResiduals(nblmes5.6, n = 250, use.u = T)
+testResiduals(simulationOutput2)
+
+plotResiduals(simulationOutput2)
+hist(simulationOutput2$scaledResiduals)
+plot(simulationOutput2)
+testUniformity(simulationOutput2)
+testDispersion(simulationOutput2)
+testZeroInflation(simulationOutput2)
+
+#add folio as random effect
+final$folio <- as.numeric(final$folio)
+#Poisson model
+lmes5.3.1<- glmer(s5~ses+region+(1|folio),data=final, family = poisson(link = "log"))
+summary(lmes5.3.1)
+#Negative binomial model
+nblmes5.6.1<- glm.nb(s5~ses+region+(1|folio),data=final)
+summary(nblmes5.6.1)
 
 # #Age at first reproduction ----------------------------------------------
 
@@ -874,17 +1034,17 @@ plot(fits6)
 lmes6.1 <- lm(log(s6)~ses,data=finals6)
 summary(lmes6.1)
 #multiple linear regression model
-lmes6.2 <- lm(log(s6)~ses+region+zona+ethnic,data=finals6)
+lmes6.2 <- lm(log(s6)~ses+region+comuna+zona+r6,data=finals6)
 summary(lmes6.2)
 #multiple linear regression model with multiple variables after step AIC
 step(lmes6.2, direction="both")
-lmes6.3 <- lm(log(s6)~ses+region+zona,data=finals6)
+lmes6.3 <- lm(log(s6)~ses+region,data=finals6)
 summary(lmes6.3)
 #generalized mixed-effect model
-lmes6.4 <- lmer(log(s6)~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic),data=finals6)
+lmes6.4 <- lmer(log(s6)~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6),data=finals6)
 summary(lmes6.4)
 #generalized mixed-effect model with step AIC variables
-lmes6.5 <- lmer(log(s6)~ses+(1+ses|region)+(1+ses|zona),data=finals6)
+lmes6.5 <- lmer(log(s6)~ses+(1+ses|region),data=finals6)
 summary(lmes6.5)
 #AIC
 AIC(lmes6.1,lmes6.2,lmes6.3, lmes6.4, lmes6.5)
@@ -908,22 +1068,25 @@ plot(fiteuh)
 lmeeuh.1 <- lm(euh~ses, data=finaleuh)
 summary(lmeeuh.1)
 #multiple linear regression model
-lmeeuh.2 <- lm(euh~ses+region+zona+ethnic, data=finaleuh)
+lmeeuh.2 <- lm(euh~ses+region+comuna+zona+r6, data=finaleuh)
 summary(lmeeuh.2)
 #model with multiple variables after step AIC
 step(lmeeuh.2, direction="both")
-#step model same as lmeeuh.1
-#generalized mixed-effect model
-lmeeuh.3 <- lmer(euh~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic), data=finaleuh)
+lmeeuh.3<-lm(euh~ses+zona,data=finaleuh)
 summary(lmeeuh.3)
+#generalized mixed-effect model
+lmeeuh.4 <- lmer(euh~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6), data=finaleuh)
+summary(lmeeuh.4)
+#generalized mixed-effect model with step AIC variables
+lmeeuh.5 <- lmer(euh~ses+(1+ses|zona), data=finaleuh)
+summary(lmeeuh.5)
 #AIC
-AIC(lmeeuh.1,lmeeuh.2,lmeeuh.3)
-#lmeeuh.1 is the best model
+AIC(lmeeuh.1,lmeeuh.2,lmeeuh.3,lmeeuh.4,lmeeuh.5)
+#lmeeuh.3 is the best model
 par(mfrow=c(2,2))
-plot(lmeeuh.1)
+plot(lmeeuh.3)
 
 # #Interbirth intervals ---------------------------------------------------
-
 
 #prepare data
 sum(is.na(final$ien))
@@ -941,25 +1104,25 @@ summary(fitien)
 plot(fitien)
 #run a generalized mixed-effect model
 #Gamma regression model
-lmeien.1 <- glm(ien~ses, data=finalien, family = Gamma(link = "identity"))
+lmeien.1 <- glm(ien~ses, data=finalien, family = Gamma(link = "inverse"))
 summary(lmeien.1)
 #Gamma regression model with multiple variables
-lmeien.2 <- glm(ien~ses+region+zona+ethnic, data=finalien, family = Gamma(link = "identity"))
+lmeien.2 <- glm(ien~ses+region+comuna+zona+r6, data=finalien, family = Gamma(link = "inverse"))
 summary(lmeien.2)
 #Gamma regression model with multiple variables after step AIC
 step(lmeien.2, direction="both")
-lmeien.3 <- glm(ien~ses+region, data=finalien, family = Gamma(link = "identity"))
+lmeien.3 <- glm(ien~ses+zona+region, data=finalien, family = Gamma(link = "inverse"))
 summary(lmeien.3)
 #Gamma mixed-effect model
-lmeien.4 <- glmer(ien~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic), data=finalien, family = Gamma(link = "identity"))
+lmeien.4 <- glmer(ien~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6), data=finalien, family = Gamma(link = "inverse"))
 summary(lmeien.4)
 #Gamma mixed-effect model with step AIC
-lmeien.5 <- glmer(ien~ses+(1+ses|region), data=finalien, family = Gamma(link = "identity"))
+lmeien.5 <- glmer(ien~ses+(1+ses|zona)+(1+ses|region), data=finalien, family = Gamma(link = "inverse"))
 summary(lmeien.5)
 #AIC
 AIC(lmeien.1,lmeien.2,lmeien.3,lmeien.4, lmeien.5)
-#lmeien.5 is the best model
-plot(lmeien.5)
+#lmeien.4 is the best model
+glm.diag.plots(lmeien.4)
 
 # Reproductive density --------------------------------------------------------
 
@@ -982,21 +1145,22 @@ plot(fitrd)
 lmerd.1 <- lm(log(rd)~ses, data=finalrd)
 summary(lmerd.1)
 #multiple linear regression model
-lmerd.2 <- lm(log(rd)~ses+region+zona+ethnic, data=finalrd)
+lmerd.2 <- lm(log(rd)~ses+region+comuna+zona+r6, data=finalrd)
 summary(lmerd.2)
 #multiple linear regression model with multiple variables after step AIC
 step(lmerd.2, direction="both")
-lmerd.3 <- lm(log(rd)~ses+region,data=finalrd)
+lmerd.3 <- lm(log(rd)~ses+zona+region,data=finalrd)
 summary(lmerd.3)
 #Multiple linear mixed-effect model
-lmerd.4 <- lmer(log(rd)~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic), data=finalrd)
+lmerd.4 <- lmer(log(rd)~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6), data=finalrd)
 summary(lmerd.4)
 #Multiple linear mixed-effect model with step AIC
-lmerd.5 <- lmer(log(rd)~ses+(1+ses|region), data=finalrd)
+lmerd.5 <- lmer(log(rd)~ses+(1+ses|zona)+(1+ses|region), data=finalrd)
 summary(lmerd.5)
 #AIC
 AIC(lmerd.1,lmerd.2,lmerd.3,lmerd.4,lmerd.5)
 #lmerd.3 are the best model
+par(mfrow=c(2,2))
 plot(lmerd.3)
 
 # #4.- let's do the plots -----------------------------------------------------
@@ -1011,82 +1175,64 @@ library(RColorBrewer)
 #install ggsci
 install.packages("ggsci")
 library(ggsci)
-<<<<<<< HEAD
-=======
 #install ggpubr
 install.packages("ggpubr")
 library(ggpubr)
->>>>>>> ea1a1d689169bf76c65dc6da0301695b6a055c62
+#install ggiraphExtra
+install.packages("ggiraphExtra")
+library(ggiraphExtra)
+#>>>>>>> ea1a1d689169bf76c65dc6da0301695b6a055c62
 
 #colorblind palette
 cbp1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73","#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 # #Nº of offspring --------------------------------------------------------
 
-#overall model
-ggplot(final,aes(x=ses, y=s5)) +
-  geom_point()+
-  geom_smooth(method="glm",method.args=list(family=poisson), se=T) +
+#prepare data
+
+plots5 <- final[,c("ses","s5","region")]
+plots5$phat <- predict(lmes5.3,type="response")
+plots5 <- plots5[with(plots5,order(region)),]
+
+#plot it
+
+ggplot(plots5, aes(x = sqrt(ses), y = phat, colour = region)) +
+  geom_point(aes(y = s5), alpha=.5, position=position_jitter(h=.2)) +
+  geom_line(size = 1) +
+  labs(x = "sqrt(SEP)", y = "N° of Offspring") +
   theme_classic()
-#zona
-ggplot(final,aes(x=ses, y=s5, colour=zona)) +
-  geom_point()+
-  geom_smooth(method="glm",method.args=list(family=poisson), se=F) +
-  theme_classic()
-#region
-ggplot(final,aes(x=ses, y=s5, colour=region)) +
-  geom_point()+
-  geom_smooth(method="glm",method.args=list(family=poisson), se=F) +
-  theme_classic()
+
 
 # #Age at first reproduction --------------------------------------------------------
 
-<<<<<<< HEAD
-colourCount = length(unique(finals6$zona))
-getPalette = colorRampPalette(brewer.pal(2, "RdYlBu"))
-=======
-colourCount = length(unique(finals6$region))
-getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
-levels(finals6$zona)[levels(finals6$zona)=="Urbano"] <- "Urban"
->>>>>>> ea1a1d689169bf76c65dc6da0301695b6a055c62
+#prepare data
 
-#overall model
-s6ova <- ggplot(finals6, aes(x=ses,y=log(s6))) +
-  geom_point()+
-  geom_smooth(method="lm", se=T) +
-  labs(x="Socioeconomic position",y="log(AFR)")+
-  theme(legend.position = "bottom",legend.key = element_blank(),panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "grey")) 
+plots6 <- finals6[,c("ses","s6","region")]
+plots6$phat <- predict(lmes6.3,type="response")
+plots6 <- plots6[with(plots6,order(region)),]
 
-s6zona <- ggplot(finals6, aes(x=ses,y=log(s6),colour=zona)) +
-  geom_point()+
-  geom_smooth(method="lm", se=F) +
-  theme(legend.position = "bottom",legend.key = element_blank(),panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "grey")) +
-  scale_colour_jco()+
-  labs(x="Socioeconomic position",y="log(AFR)",colour="Urban/Rural")+
-  guides(colour = guide_legend(title.position = "top"))
+#plot it
 
-colourCount = length(unique(finals6$region))
-getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
-s6region <- ggplot(finals6, aes(x=ses,y=log(s6),colour=region)) +
-  geom_point()+
-  geom_smooth(method="lm", se=F) +
-  theme(legend.position = "bottom",legend.key = element_blank(),panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "grey")) +
-  scale_colour_manual(values = getPalette(colourCount))+
-  labs(x="Socioeconomic position",y="log(AFR)",colour="Region")+
-  guides(colour = guide_legend(title.position = "top"))
+ggplot(plots6, aes(x = ses, y = exp(phat), colour = region)) +
+  geom_point(aes(y = s6), alpha=.5, position=position_jitter(h=.2)) +
+  geom_line(size = 1) +
+  labs(x = "SEP", y = "AFR") +
+  theme_classic()
 
-<<<<<<< HEAD
-ggarrange(s6ova, s6zona, s6region, labels = c("A", "B", "C"), ncol = 2, nrow = 2)
-
-=======
->>>>>>> ea1a1d689169bf76c65dc6da0301695b6a055c62
 # #Age at last reproduction --------------------------------------------------------
 
-#overall model
-ggplot(finaleuh,aes(x=ses, y=euh)) +
-  geom_point()+
-  geom_smooth(method="lm", se=T) +
-  labs(x="Socioeconomic position",y="ALR")+
+#prepare data
+
+ploteuh <- finaleuh[,c("ses","euh","zona")]
+ploteuh$phat <- predict(lmeeuh.3,type="response")
+ploteuh <- ploteuh[with(ploteuh,order(zona)),]
+
+#plot it
+
+ggplot(ploteuh, aes(x = ses, y = phat, colour = zona)) +
+  geom_point(aes(y = euh), alpha=.5, position=position_jitter(h=.2)) +
+  geom_line(size = 1) +
+  labs(x = "SEP", y = "ALR") +
   theme_classic()
 
 # #Interbirth interval --------------------------------------------------------
@@ -1104,17 +1250,21 @@ ggplot(finalien,aes(x=ses, y=ien, colour=region)) +
 
 # Birth density --------------------------------------------------------
 
-colourCount = length(unique(finalrd$region))
-getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
+#prepare data
 
-#overall model
-ggplot(finalrd,aes(ses,log(rd),colour=region))+
-  geom_point()+
-  geom_smooth(method="lm", se=F) +
-  theme(legend.position = "bottom",legend.key = element_blank(),panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line = element_line(colour = "grey")) +
-  scale_colour_manual(values = getPalette(colourCount))+
-  labs(x="Socioeconomic position",y="log(BD)",colour="Region")+
-  guides(colour = guide_legend(title.position = "top"))
+plotrd <- finalrd[,c("ses","rd","zona","region")]
+plotrd$phat <- predict(lmerd.3,type="response")
+plotrd <- plotrd[with(plotrd,order(zona,region)),]
+
+#plot it
+
+ggplot(plotrd, aes(x = ses, y = exp(phat), colour = region)) +
+  geom_point(aes(y = rd), alpha=.5, position=position_jitter(h=.2)) +
+  geom_line(size = 1) +
+  scale_color_grey() +
+  labs(x = "SEP", y = "Reproductive Density") +
+  facet_grid(. ~ zona) +
+  theme_classic()
 
 # #former code...useful for recycle ---------------------------------------
 
