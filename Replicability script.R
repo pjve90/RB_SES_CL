@@ -1268,9 +1268,9 @@ ggplot(plots5, aes(x = sqrt(ses), y = phat, colour = region, shape = region)) +
   geom_point(aes(y = s5), alpha=.5, position=position_jitter(h=.2)) +
   geom_line(size = 1, aes(linetype=region)) +
   labs(x = expression(sqrt(SEP)), y = "N° of Offspring") +
-  scale_shape_manual(values=c(17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,16)) +
-  scale_linetype_manual(values=c(1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2)) +
-  scale_colour_manual(values=c("#000000","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7")) +
+  scale_shape_manual("Region",values=c(17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,16)) +
+  scale_linetype_manual("Region",values=c(1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2)) +
+  scale_colour_manual("Region",values=c("#000000","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7")) +
   theme_classic()
 
 
@@ -1288,9 +1288,9 @@ ggplot(plots6, aes(x = ses, y = exp(phat), colour = region, shape = region)) +
   geom_point(aes(y = s6), alpha=.5, position=position_jitter(h=.2)) +
   geom_line(size = 1, aes(linetype=region)) +
   labs(x = "SEP", y = "AFR") +
-  scale_shape_manual(values=c(17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,16)) +
-  scale_linetype_manual(values=c(1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2)) +
-  scale_colour_manual(values=c("#000000","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7")) +
+  scale_shape_manual("Region",values=c(17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,16)) +
+  scale_linetype_manual("Region",values=c(1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2)) +
+  scale_colour_manual("Region",values=c("#000000","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7")) +
   theme_classic()
 
 # #Age at last reproduction --------------------------------------------------------
@@ -1307,7 +1307,7 @@ ggplot(ploteuh, aes(x = ses, y = phat, colour = zona)) +
   geom_point(aes(y = euh), alpha=.5, position=position_jitter(h=.2)) +
   geom_line(size = 1) +
   labs(x = "SEP", y = "ALR") +
-  scale_colour_manual(values=c("#E69F00","#009E73")) +
+  scale_colour_manual("Rural vs Urban",values=c("#E69F00","#009E73")) +
   theme_classic()
 
 # #Interbirth interval --------------------------------------------------------
@@ -1315,6 +1315,8 @@ ggplot(ploteuh, aes(x = ses, y = phat, colour = zona)) +
 #prepare data
 
 plotien <- finalien[,c("ses","ien","zona","region","comuna","r6")]
+plotien$zona<-factor(plotien$zona,levels = c("Urbano","Rural"),labels = c("Urban","Rural"))
+plotien$r6<-factor(plotien$r6,levels = c("No pertenece a ningún pueblo indígena","Mapuche","Aymara","Diaguita","Atacameño (Likán Antai)","Quechua","Coya","Kawésqar (Alacalufes)"),labels = c("No indigineous","Mapuche","Aymara","Diaguita","Likán Antai","Quechua","Coya","Kawésqar"))
 plotien$phat <- predict(lmeien.4,type="response")
 plotien <- plotien[with(plotien,order(zona,region,comuna,r6)),]
 
@@ -1330,20 +1332,12 @@ ggplot(plotien, aes(x = ses, y = phat, colour = region,shape=comuna)) +
   facet_grid(r6~zona)+
   theme_classic()
 
-ggplot(plotien, aes(x = ses, y = phat, colour = region,shape=region)) +
-  geom_point(aes(y = ien), alpha=.5, position=position_jitter(h=.2),show.legend = F) +
-  geom_line(size = 1, aes(linetype=region),show.legend = F) +
-  labs(x = "SEP", y = "IBI") +
-  scale_shape_manual(values=sample(1:6,15,replace=T)) +
-  scale_linetype_manual(values=c(1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2)) +
-  scale_colour_manual(values=c("#000000","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7")) +
-  theme_classic()
-
 # Birth density --------------------------------------------------------
 
 #prepare data
 
 plotrd <- finalrd[,c("ses","rd","zona","region")]
+plotrd$zona<-factor(plotrd$zona,levels = c("Urbano","Rural"),labels = c("Urban","Rural"))
 plotrd$phat <- predict(lmerd.3,type="response")
 plotrd <- plotrd[with(plotrd,order(zona,region)),]
 
@@ -1352,10 +1346,10 @@ plotrd <- plotrd[with(plotrd,order(zona,region)),]
 ggplot(plotrd, aes(x = ses, y = exp(phat), colour = region, shape = region)) +
   geom_point(aes(y = rd), alpha=.5, position=position_jitter(h=.2)) +
   geom_line(size = 1, aes(linetype=region)) +
-  labs(x = "SEP", y = "AFR") +
-  scale_shape_manual(values=c(17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,16)) +
-  scale_linetype_manual(values=c(1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2)) +
-  scale_colour_manual(values=c("#000000","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7")) +
+  labs(x = "SEP", y = "Birth density") +
+  scale_shape_manual("Region",values=c(17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,16)) +
+  scale_linetype_manual("Region",values=c(1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2)) +
+  scale_colour_manual("Region",values=c("#000000","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7")) +
   facet_grid(.~zona)+
   theme_classic()
 
