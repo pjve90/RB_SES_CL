@@ -1298,6 +1298,7 @@ ggplot(plots6, aes(x = ses, y = exp(phat), colour = region, shape = region)) +
 #prepare data
 
 ploteuh <- finaleuh[,c("ses","euh","zona")]
+ploteuh$zona<-factor(ploteuh$zona,levels = c("Urbano","Rural"),labels = c("Urban","Rural"))
 ploteuh$phat <- predict(lmeeuh.3,type="response")
 ploteuh <- ploteuh[with(ploteuh,order(zona)),]
 
