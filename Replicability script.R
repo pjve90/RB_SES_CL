@@ -4,8 +4,8 @@
 # Workspace management ----------------------------------------------------
 
 #Establishing directory
-#getwd()
-#setwd("folder_directory")
+getwd()
+setwd("folder_directory")
 #Establishing history and image
 savehistory(".~RB_SES_CL.Rhistory")
 save.image(".~RB_SES_CL.RData")
@@ -20,11 +20,11 @@ memory.size(max = FALSE)
 
 #R package to use
 #"Hmisc" package
-# #install.packages(|"Hmisc")
+install.packages(|"Hmisc")
 library(Hmisc)
 #"tidyverse" package
 library(dplyr)
-#install.packages("tidyverse")
+install.packages("tidyverse")
 library(tidyverse)
 
 #importing CASEN with spss.get()
@@ -802,7 +802,7 @@ summary(aov(ytotcorh~v2+v6+v9+v12+v24+v25+v26, test))
 # #FAMD to get socioeconomic scores (is a PCA for mixed data) -------------
 
 #install FactoMineR
-# #install.packages("FactoMineR")
+install.packages("FactoMineR")
 library(FactoMineR)
 #FAMD with all the SES variables
 summary(test[,c("ESC","educ","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot","s14","o29","r19","v1","v2","v4","v6","v9","v11","v12","v23","v24","v25","v26")])
@@ -839,27 +839,14 @@ final$ses2 <- ntile(final$ses, 2)
 
 
 #install package lme4
-# #install.packages("lme4")
+install.packages("lme4")
 library(lme4)
-#"fitdistrplus" package
-#update.packages("fitdistrplus")
-#install.packages("fitdistrplus")
-library(fitdistrplus)
-#"boot" package
-#install.packages("boot")
-library(boot)
 #"AER" package
-#install.packages("AER")
+install.packages("AER")
 library(AER)
 
 # #Nº of Offspring --------------------------------------------------------
 
-#distribution
-#par(mfrow=c(1,1))
-#descdist(final$s5, discrete = T, boot = 500)
-#fits5 <- fitdist(final$s5, "pois")
-#summary(fits5)
-#plot(fits5)
 #run a generalized mixed-effect model
 #Poisson regression only with ses
 lmes5.1 <- glm(s5~sqrt(ses),data=final, family = poisson(link = "log"))
@@ -932,7 +919,7 @@ dispersiontest(lmes5.3,trafo=1)
 #check influence points
 influencePlot(lmes5.3)
 #compare to zero inflated model
-#install.packages("pscl")
+install.packages("pscl")
 library(pscl)
 lmes5.zinf <- zeroinfl(s5~ses+region,data=final, dist="poisson")
 AIC(lmes5.3, lmes5.zinf)
@@ -966,7 +953,7 @@ dispersiontest(nblmes5.6,trafo=1)
 #check influence points
 influencePlot(nblmes5.6)
 #compare to zero inflated model
-#install.packages("pscl")
+install.packages("pscl")
 library(pscl)
 nblmes3.zinf <- zeroinfl(s5~sqrt(ses)+region,data=final, dist="negbin")
 AIC(nblmes5.3, nblmes3.zinf)
@@ -986,7 +973,7 @@ points(pris$upr  ~ final$ses, col="grey", pch=19)
 
 #Use DHARMa
 #Poisson model
-#install.packages("DHARMa")
+install.packages("DHARMa")
 library(DHARMa)
 simulationOutput <- simulateResiduals(nblmes5.3, n = 250, use.u = T)
 testResiduals(simulationOutput)
@@ -998,7 +985,7 @@ testUniformity(simulationOutput)
 testDispersion(simulationOutput)
 testZeroInflation(simulationOutput)
 #Negative binomial model
-#install.packages("DHARMa")
+install.packages("DHARMa")
 library(DHARMa)
 simulationOutput2 <- simulateResiduals(nblmes5.6, n = 250, use.u = T)
 testResiduals(simulationOutput2)
@@ -1061,25 +1048,6 @@ summary(nblmes5.3.1)
 
 simulationOutput <- simulateResiduals(nblmes5.3.1)
 plot(simulationOutput)
-
-#Still not quite right. I'll follow up by trying two other things I read here:
-#https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
-##install.packages("glmmTMB")
-library(glmmTMB)
-
-#nblmes5.3.2 <-
-#   glmmTMB(
-#     s5 ~ ses + region + zona + (1 |
-#                                   folio),
-#     ziformula =  ~ (1 | folio) ,
-#     data = final,
-#     family = nbinom2
-#   )
-# simulationOutput <- simulateResiduals(nblmes5.3.2)
-# plot(simulationOutput)
-
-#Looks even worst. Can I do zero inflated + random-effects with glmer.nb?
-
 
 # #Age at first reproduction ----------------------------------------------
 
@@ -1233,26 +1201,9 @@ par(mfrow=c(1,1))
 # #4.- let's do the plots -----------------------------------------------------
 
 
-#install ggeffects package
-#install.packages("ggeffects")
-library(ggeffects)
-#install RColorBrewer
-#install.packages("RColorBrewer")
-library(RColorBrewer)
-#install ggsci
-#install.packages("ggsci")
-library(ggsci)
-#install ggpubr
-#install.packages("ggpubr")
-library(ggpubr)
-#install ggiraphExtra
-#install.packages("ggiraphExtra")
-library(ggiraphExtra)
-#install.packages("ggthemes")
-library(ggthemes)
-
-#colorblind palette
-cbp1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73","#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+#install ggplot2
+install.packages("ggplot2")
+library(ggplot2)
 
 # #Nº of offspring --------------------------------------------------------
 
