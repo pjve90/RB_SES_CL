@@ -20,7 +20,7 @@ memory.size(max = FALSE)
 
 #R package to use
 #"Hmisc" package
-install.packages(|"Hmisc")
+install.packages("Hmisc")
 library(Hmisc)
 #"tidyverse" package
 library(dplyr)
@@ -852,14 +852,14 @@ library(AER)
 lmes5.1 <- glm(s5~sqrt(ses),data=final, family = poisson(link = "log"))
 summary(lmes5.1)
 #Poisson regression with multiple variables
-lmes5.2 <- glm(s5~sqrt(ses)+region+comuna+zona+r6,data=final, family = poisson(link = "log"))
+lmes5.2 <- glm(s5~sqrt(ses)+region+zona+ethnic,data=final, family = poisson(link = "log"))
 summary(lmes5.2)
 #Poisson regression with multiple variables after step AIC
 step(lmes5.2, direction="both")
 lmes5.3 <- glm(s5~sqrt(ses)+region,data=final, family = poisson(link = "log"))
 summary(lmes5.3)
 #generalized Poisson mixed-effect model
-lmes5.4 <- glmer(s5~sqrt(ses)+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6),data=final, family = poisson(link = "log"))
+lmes5.4 <- glmer(s5~sqrt(ses)+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic),data=final, family = poisson(link = "log"))
 summary(lmes5.4)
 #generalized Poisson mixed-effect model with step AIC
 lmes5.5 <- glmer(s5~sqrt(ses)+(1+ses|region),data=final, family = poisson(link = "log"))
@@ -877,7 +877,7 @@ dispersiontest(lmes5.3,trafo=1)
 nblmes5.1 <- glm.nb(s5~ses,data=final,link=log)
 summary(nblmes5.1)
 #Poisson regression with multiple variables
-nblmes5.2 <- glm.nb(s5~ses+region+comuna+zona+r6,data=final,link=log)
+nblmes5.2 <- glm.nb(s5~ses+region+zona+ethnic,data=final,link=log)
 summary(nblmes5.2)
 #Poisson regression with multiple variables after step AIC
 step(nblmes5.2, direction="both")
@@ -1065,14 +1065,14 @@ plot(fits6)
 lmes6.1 <- lm(log(s6)~ses,data=finals6)
 summary(lmes6.1)
 #multiple linear regression model
-lmes6.2 <- lm(log(s6)~ses+region+comuna+zona+r6,data=finals6)
+lmes6.2 <- lm(log(s6)~ses+region+zona+ethnic,data=finals6)
 summary(lmes6.2)
 #multiple linear regression model with multiple variables after step AIC
 step(lmes6.2, direction="both")
 lmes6.3 <- lm(log(s6)~ses+region,data=finals6)
 summary(lmes6.3)
 #generalized mixed-effect model
-lmes6.4 <- lmer(log(s6)~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6),data=finals6)
+lmes6.4 <- lmer(log(s6)~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic),data=finals6)
 summary(lmes6.4)
 #generalized mixed-effect model with step AIC variables
 lmes6.5 <- lmer(log(s6)~ses+(1+ses|region),data=finals6)
@@ -1100,14 +1100,14 @@ plot(fiteuh)
 lmeeuh.1 <- lm(euh~ses, data=finaleuh)
 summary(lmeeuh.1)
 #multiple linear regression model
-lmeeuh.2 <- lm(euh~ses+region+comuna+zona+r6, data=finaleuh)
+lmeeuh.2 <- lm(euh~ses+region+zona+ethnic, data=finaleuh)
 summary(lmeeuh.2)
 #model with multiple variables after step AIC
 step(lmeeuh.2, direction="both")
 lmeeuh.3<-lm(euh~ses+zona,data=finaleuh)
 summary(lmeeuh.3)
 #generalized mixed-effect model
-lmeeuh.4 <- lmer(euh~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6), data=finaleuh)
+lmeeuh.4 <- lmer(euh~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic), data=finaleuh)
 summary(lmeeuh.4)
 #generalized mixed-effect model with step AIC variables
 lmeeuh.5 <- lmer(euh~ses+(1+ses|zona), data=finaleuh)
@@ -1140,22 +1140,18 @@ plot(fitien)
 lmeien.1 <- glm(ien~ses, data=finalien, family = Gamma(link = "inverse"))
 summary(lmeien.1)
 #Gamma regression model with multiple variables
-lmeien.2 <- glm(ien~ses+region+comuna+zona+r6, data=finalien, family = Gamma(link = "inverse"))
+lmeien.2 <- glm(ien~ses+region+zona+ethnic, data=finalien, family = Gamma(link = "inverse"))
 summary(lmeien.2)
 #Gamma regression model with multiple variables after step AIC
 step(lmeien.2, direction="both")
-lmeien.3 <- glm(ien~ses+zona+region, data=finalien, family = Gamma(link = "inverse"))
-summary(lmeien.3)
+#step is the same as multiple Gamma regresion model
 #Gamma mixed-effect model
-lmeien.4 <- glmer(ien~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6), data=finalien, family = Gamma(link = "inverse"))
-summary(lmeien.4)
-#Gamma mixed-effect model with step AIC
-lmeien.5 <- glmer(ien~ses+(1+ses|zona)+(1+ses|region), data=finalien, family = Gamma(link = "inverse"))
-summary(lmeien.5)
+lmeien.3 <- glmer(ien~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic), data=finalien, family = Gamma(link = "inverse"))
+summary(lmeien.3)
 #AIC
-AIC(lmeien.1,lmeien.2,lmeien.3,lmeien.4, lmeien.5)
-#lmeien.4 is the best model
-glm.diag.plots(lmeien.4)
+AIC(lmeien.1,lmeien.2,lmeien.3)
+#lmeien.2 is the best model
+glm.diag.plots(lmeien.2)
 
 # Reproductive density --------------------------------------------------------
 
@@ -1179,14 +1175,14 @@ plot(fitrd)
 lmerd.1 <- lm(log(rd)~ses, data=finalrd)
 summary(lmerd.1)
 #multiple linear regression model
-lmerd.2 <- lm(log(rd)~ses+region+comuna+zona+r6, data=finalrd)
+lmerd.2 <- lm(log(rd)~ses+region+zona+ethnic, data=finalrd)
 summary(lmerd.2)
 #multiple linear regression model with multiple variables after step AIC
 step(lmerd.2, direction="both")
 lmerd.3 <- lm(log(rd)~ses+zona+region,data=finalrd)
 summary(lmerd.3)
 #Multiple linear mixed-effect model
-lmerd.4 <- lmer(log(rd)~ses+(1+ses|region)+(1+ses|comuna)+(1+ses|zona)+(1+ses|r6), data=finalrd)
+lmerd.4 <- lmer(log(rd)~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic), data=finalrd)
 summary(lmerd.4)
 #Multiple linear mixed-effect model with step AIC
 lmerd.5 <- lmer(log(rd)~ses+(1+ses|zona)+(1+ses|region), data=finalrd)
@@ -1266,22 +1262,22 @@ ggplot(ploteuh, aes(x = ses, y = phat, colour = zona)) +
 
 #prepare data
 
-plotien <- finalien[,c("ses","ien","zona","region","comuna","r6")]
+plotien <- finalien[,c("ses","ien","zona","region","ethnic")]
 plotien$zona<-factor(plotien$zona,levels = c("Urbano","Rural"),labels = c("Urban","Rural"))
-plotien$r6<-factor(plotien$r6,levels = c("No pertenece a ningún pueblo indígena","Mapuche","Aymara","Diaguita","Atacameño (Likán Antai)","Quechua","Coya","Kawésqar (Alacalufes)"),labels = c("No indigineous","Mapuche","Aymara","Diaguita","Likán Antai","Quechua","Coya","Kawésqar"))
-plotien$phat <- predict(lmeien.4,type="response")
-plotien <- plotien[with(plotien,order(zona,region,comuna,r6)),]
+plotien$ethnic<-factor(plotien$ethnic,levels = c("No","Sí"),labels = c("Not indigineous","Indigenous"))
+plotien$phat <- predict(lmeien.2,type="response")
+plotien <- plotien[with(plotien,order(zona,region,ethnic)),]
 
 #plot it
 
-ggplot(plotien, aes(x = ses, y = phat, colour = region,shape=comuna)) +
-  geom_point(aes(y = ien), alpha=.5, position=position_jitter(h=.2),show.legend = F) +
-  geom_line(size = 1, aes(linetype=region),show.legend = F) +
+ggplot(plotien, aes(x = ses, y = phat, colour = region, shape=region)) +
+  geom_point(aes(y = ien), alpha=.5, position=position_jitter(h=.2)) +
+  geom_line(size = 1, aes(linetype=region)) +
   labs(x = "SEP", y = "IBI") +
-  scale_shape_manual(values=sample(1:6,311,replace=T)) +
-  scale_linetype_manual(values=c(1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2)) +
-  scale_colour_manual(values=c("#000000","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7")) +
-  facet_grid(r6~zona)+
+  scale_shape_manual("Region",values=c(17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,16)) +
+  scale_linetype_manual("Region",values=c(1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2)) +
+  scale_colour_manual("Region",values=c("#000000","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7")) +
+  facet_grid(ethnic~zona)+
   theme_classic()
 
 # Birth density --------------------------------------------------------
