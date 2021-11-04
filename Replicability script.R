@@ -49,8 +49,8 @@ sum(is.na(mononuc$nucleo))
 
 #women selection that are head or partner of the head of the household and have between 45 and 50 years old
 wom <- mononuc[which(mononuc$sexo == "Mujer"),]
-#45-49 years old selection
-wom4549 <- wom[which(wom$edad >= 45 & wom$edad <= 49),]
+#43-52 years old selection
+wom4549 <- wom[which(wom$edad >= 43 & wom$edad <= 52),]
 #head of the household selection
 wom4549boss <- wom4549[which(wom4549$pco1 == "Jefe(a) de hogar"),]
 wom4549boss$s5[which(wom4549boss$s5 == "No Sabe")] <- NA 
@@ -148,7 +148,7 @@ sum(is.na(womych$ien))
 womych <- data.frame(womych)
 
 
-# #Modes of parity --------------------------------------------------------
+# #Birthing density --------------------------------------------------------
 
 
 womych <- mutate(womych, rd = s5/(euh - s6))
@@ -166,7 +166,7 @@ sum(is.na(womych$euh))
 sum(is.na(womych$ien))
 sum(is.na(womych$rd))
 fcohort <- womych[complete.cases(womych[,c("s5","s6","euh","ien","rd")]),]
-fcohort <- fcohort[which(fcohort$edad >= 45 & fcohort$edad <= 49),]
+fcohort <- fcohort[which(fcohort$edad >= 43 & fcohort$edad <= 52),]
 fcohort <- fcohort[which(fcohort$euh >= fcohort$s6),]
 fcohort <- fcohort[which(fcohort$r1a == "Chilena (exclusivamente)" | fcohort$r1a == "Chilena y otra (doble nacionalidad)"),]
 summary(fcohort$r1a)
@@ -808,10 +808,11 @@ library(FactoMineR)
 summary(test[,c("ESC","educ","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot","s14","o29","r19","v1","v2","v4","v6","v9","v11","v12","v23","v24","v25","v26")])
 famd1 <- FAMD(test[,c("ESC","educ","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot","s14","o29","r19","v1","v2","v4","v6","v9","v11","v12","v23","v24","v25","v26")])
 summary(famd1)
+par(mfrow=c(1,1))
 hist(famd1$ind$coord[,1])
-which(famd1$ind$coord[,1] > 17)
+which(famd1$ind$coord[,1] > 18)
 #FAMD without outliers
-famd2 <-FAMD(test[which(famd1$ind$coord[,1] < 17),c("ESC","educ","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot","s14","o29","r19","v1","v2","v4","v6","v9","v11","v12","v23","v24","v25","v26")])
+famd2 <-FAMD(test[which(famd1$ind$coord[,1] < 18),c("ESC","educ","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot","s14","o29","r19","v1","v2","v4","v6","v9","v11","v12","v23","v24","v25","v26")])
 summary(famd2)
 hist(famd2$ind$coord[,1])
 famdsub <- famd2$ind$coord[,1]
@@ -823,7 +824,7 @@ q <- scale(famdsub, center = T, scale = T)
 par(mfrow=c(1,1))
 hist(q)
 range01 <- function(x){(x-min(x))/(max(x)-min(x))}
-final <- test[ which(famd1$ind$coord[,1] < 17),c("folio","edad", "s5", "s6", "euh", "ien","rd","region","comuna","zona","r6","ethnic","ESC","educ","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot","s14","o29","r19","v1","v2","v4","v6","v9","v11","v12","v23","v24","v25","v26")]
+final <- test[ which(famd1$ind$coord[,1] < 18),c("folio","edad", "s5", "s6", "euh", "ien","rd","region","comuna","zona","r6","ethnic","ESC","educ","ytrabajoCorh","yoautCorh","yautcorh","ysubh","ytotcorh","ypchtot","s14","o29","r19","v1","v2","v4","v6","v9","v11","v12","v23","v24","v25","v26")]
 final$ses <- range01(q)
 final$ses <- as.vector(final$ses)
 hist(final$ses, breaks = 100)
@@ -844,6 +845,9 @@ library(lme4)
 #"AER" package
 install.packages("AER")
 library(AER)
+#install package boot
+install.packages("boot")
+library(boot)
 
 # #Nº of Offspring --------------------------------------------------------
 
@@ -912,26 +916,26 @@ rootogram(fit_s5)
 Ord_plot(final$s5)
 distplot(final$s5, type="poisson")
 #good-of-fitness measure
-anova(lmes5.3,test = "Chisq")
+anova(lmes5.1,test = "Chisq")
 #check under/overdispersion
-deviance(lmes5.3)/lmes5.3$df.residual
-dispersiontest(lmes5.3,trafo=1)
+deviance(lmes5.1)/lmes5.1$df.residual
+dispersiontest(lmes5.1,trafo=1)
 #check influence points
-influencePlot(lmes5.3)
+influencePlot(lmes5.1)
 #compare to zero inflated model
 install.packages("pscl")
 library(pscl)
 lmes5.zinf <- zeroinfl(s5~ses+region,data=final, dist="poisson")
 AIC(lmes5.3, lmes5.zinf)
 #plot residuals
-res <- residuals(lmes5.3, type="deviance")
-plot(log(predict(lmes5.3)), res)
+res <- residuals(lmes5.1, type="deviance")
+plot(log(predict(lmes5.1)), res)
 abline(h=0, lty=2)
 qqnorm(res)
 qqline(res)
 #diagnostic plots
 plot(s5~ses, data=final) 
-prs  <- predict(lmes5.3, type="response", se.fit=TRUE)
+prs  <- predict(lmes5.1, type="response", se.fit=TRUE)
 pris <- data.frame("pest"=prs[[1]], "lwr"=prs[[1]]-prs[[2]], "upr"=prs[[1]]+prs[[2]])
 points(pris$pest ~ final$ses, col="red")
 points(pris$lwr  ~ final$ses, col="pink", pch=19)
@@ -975,7 +979,7 @@ points(pris$upr  ~ final$ses, col="grey", pch=19)
 #Poisson model
 install.packages("DHARMa")
 library(DHARMa)
-simulationOutput <- simulateResiduals(nblmes5.3, n = 250, use.u = T)
+simulationOutput <- simulateResiduals(lmes5.1, n = 250, use.u = T)
 testResiduals(simulationOutput)
 
 plotResiduals(simulationOutput)
@@ -1104,7 +1108,7 @@ lmeeuh.2 <- lm(euh~ses+region+zona+ethnic, data=finaleuh)
 summary(lmeeuh.2)
 #model with multiple variables after step AIC
 step(lmeeuh.2, direction="both")
-lmeeuh.3<-lm(euh~ses+zona,data=finaleuh)
+lmeeuh.3<-lm(euh~ses,data=finaleuh)
 summary(lmeeuh.3)
 #generalized mixed-effect model
 lmeeuh.4 <- lmer(euh~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic), data=finaleuh)
@@ -1179,19 +1183,15 @@ lmerd.2 <- lm(log(rd)~ses+region+zona+ethnic, data=finalrd)
 summary(lmerd.2)
 #multiple linear regression model with multiple variables after step AIC
 step(lmerd.2, direction="both")
-lmerd.3 <- lm(log(rd)~ses+zona+region,data=finalrd)
-summary(lmerd.3)
+#step is the same as lmerd.2
 #Multiple linear mixed-effect model
-lmerd.4 <- lmer(log(rd)~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic), data=finalrd)
-summary(lmerd.4)
-#Multiple linear mixed-effect model with step AIC
-lmerd.5 <- lmer(log(rd)~ses+(1+ses|zona)+(1+ses|region), data=finalrd)
-summary(lmerd.5)
+lmerd.3 <- lmer(log(rd)~ses+(1+ses|region)+(1+ses|zona)+(1+ses|ethnic), data=finalrd)
+summary(lmerd.3)
 #AIC
-AIC(lmerd.1,lmerd.2,lmerd.3,lmerd.4,lmerd.5)
-#lmerd.3 are the best model
+AIC(lmerd.1,lmerd.2,lmerd.3)
+#lmerd.2 is the best model
 par(mfrow=c(2,2))
-plot(lmerd.3)
+plot(lmerd.2)
 par(mfrow=c(1,1))
 
 # #4.- let's do the plots -----------------------------------------------------
@@ -1212,7 +1212,7 @@ plots5 <- plots5[with(plots5,order(region)),]
 #plot it
 
 ggplot(plots5, aes(x = sqrt(ses), y = phat, colour = region, shape = region)) +
-  geom_point(aes(y = s5), alpha=.5, position=position_jitter(h=.2)) +
+  geom_point(aes(y = s5), alpha=.25, position=position_jitter(h=.2)) +
   geom_line(size = 1, aes(linetype=region)) +
   labs(x = expression(sqrt(SEP)), y = "N° of Offspring") +
   scale_shape_manual("Region",values=c(17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,16)) +
@@ -1232,7 +1232,7 @@ plots6 <- plots6[with(plots6,order(region)),]
 #plot it
 
 ggplot(plots6, aes(x = ses, y = exp(phat), colour = region, shape = region)) +
-  geom_point(aes(y = s6), alpha=.5, position=position_jitter(h=.2)) +
+  geom_point(aes(y = s6), alpha=.25, position=position_jitter(h=.2)) +
   geom_line(size = 1, aes(linetype=region)) +
   labs(x = "SEP", y = "AFR") +
   scale_shape_manual("Region",values=c(17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,16)) +
@@ -1244,18 +1244,15 @@ ggplot(plots6, aes(x = ses, y = exp(phat), colour = region, shape = region)) +
 
 #prepare data
 
-ploteuh <- finaleuh[,c("ses","euh","zona")]
-ploteuh$zona<-factor(ploteuh$zona,levels = c("Urbano","Rural"),labels = c("Urban","Rural"))
+ploteuh <- finaleuh[,c("ses","euh")]
 ploteuh$phat <- predict(lmeeuh.3,type="response")
-ploteuh <- ploteuh[with(ploteuh,order(zona)),]
 
 #plot it
 
-ggplot(ploteuh, aes(x = ses, y = phat, colour = zona)) +
-  geom_point(aes(y = euh), alpha=.5, position=position_jitter(h=.2)) +
+ggplot(ploteuh, aes(x = ses, y = phat)) +
+  geom_point(aes(y = euh), alpha=.25, position=position_jitter(h=.2)) +
   geom_line(size = 1) +
   labs(x = "SEP", y = "ALR") +
-  scale_colour_manual("Rural vs Urban",values=c("#E69F00","#009E73")) +
   theme_classic()
 
 # #Interbirth interval --------------------------------------------------------
@@ -1264,14 +1261,14 @@ ggplot(ploteuh, aes(x = ses, y = phat, colour = zona)) +
 
 plotien <- finalien[,c("ses","ien","zona","region","ethnic")]
 plotien$zona<-factor(plotien$zona,levels = c("Urbano","Rural"),labels = c("Urban","Rural"))
-plotien$ethnic<-factor(plotien$ethnic,levels = c("No","Sí"),labels = c("Not indigineous","Indigenous"))
+plotien$ethnic<-factor(plotien$ethnic,levels = c("No","Sí"),labels = c("Not indigenous","Indigenous"))
 plotien$phat <- predict(lmeien.2,type="response")
 plotien <- plotien[with(plotien,order(zona,region,ethnic)),]
 
 #plot it
 
 ggplot(plotien, aes(x = ses, y = phat, colour = region, shape=region)) +
-  geom_point(aes(y = ien), alpha=.5, position=position_jitter(h=.2)) +
+  geom_point(aes(y = ien), alpha=.25, position=position_jitter(h=.2)) +
   geom_line(size = 1, aes(linetype=region)) +
   labs(x = "SEP", y = "IBI") +
   scale_shape_manual("Region",values=c(17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,16)) +
@@ -1284,19 +1281,21 @@ ggplot(plotien, aes(x = ses, y = phat, colour = region, shape=region)) +
 
 #prepare data
 
-plotrd <- finalrd[,c("ses","rd","zona","region")]
+plotrd <- finalrd[,c("ses","rd","zona","region","ethnic")]
 plotrd$zona<-factor(plotrd$zona,levels = c("Urbano","Rural"),labels = c("Urban","Rural"))
-plotrd$phat <- predict(lmerd.3,type="response")
-plotrd <- plotrd[with(plotrd,order(zona,region)),]
+plotrd$ethnic<-factor(plotrd$ethnic,levels = c("No","Sí"),labels = c("Not indigenous","Indigenous"))
+plotrd$phat <- predict(lmerd.2,type="response")
+plotrd <- plotrd[with(plotrd,order(zona,region,ethnic)),]
+
 
 #plot it
 
-ggplot(plotrd, aes(x = ses, y = exp(phat), colour = region, shape = region)) +
-  geom_point(aes(y = rd), alpha=.5, position=position_jitter(h=.2)) +
+ggplot(plotrd, aes(x = ses, y = exp(phat), colour = region, shape=region)) +
+  geom_point(aes(y = rd), alpha=.25, position=position_jitter(h=.2)) +
   geom_line(size = 1, aes(linetype=region)) +
-  labs(x = "SEP", y = "Birth density") +
+  labs(x = "SEP", y = "Birthing density") +
   scale_shape_manual("Region",values=c(17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,16)) +
   scale_linetype_manual("Region",values=c(1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2)) +
   scale_colour_manual("Region",values=c("#000000","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7","#E69F00","#56B4E9","#009E73","#F0E442","#0072B2","#D55E00","#CC79A7")) +
-  facet_grid(.~zona)+
+  facet_grid(ethnic~zona)+
   theme_classic()
